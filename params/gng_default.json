@@ -1,0 +1,9 @@
+{
+    "drift_rate_go": 0.4,
+    "drift_rate_nogo": 0.2,
+    "threshold": 1.0,
+    "noise_std": 0.15,
+    "response_window_ms": 500,
+    "n_trials": 100,
+    "go_probability": 0.8
+}

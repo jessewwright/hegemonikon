@@ -1,0 +1,10 @@
+{
+    "drift_rate_immediate": 0.35,
+    "drift_rate_delayed": 0.25,
+    "threshold": 1.0,
+    "noise_std": 0.1,
+    "discount_rate": 0.05,
+    "n_trials": 50,
+    "delay_values": [1, 7, 30, 90],
+    "reward_values": [10, 20, 50, 100]
+}
