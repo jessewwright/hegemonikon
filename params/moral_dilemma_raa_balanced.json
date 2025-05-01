@@ -1,0 +1,22 @@
+{
+    "w_s": 0.1,
+    "w_n": 0.01,
+    "w_u": 0.2,
+    "noise_std_dev": 0.15,
+    "base_threshold": 1.0,
+    "k_ser": 0.5,
+    "normal_serotonin_level": 0.0,
+    "dt": 0.01,
+    "max_time": 3.0,
+    "raa": {
+        "raa_max_cycles": 3,
+        "raa_time_trigger_factor": 0.6,
+        "raa_urgency_boost": 0.4,
+        "raa_noise_boost": 0.2,
+        "raa_threshold_collapse_rate": 0.0
+    },
+    "norms": {
+        "lie": -0.7,
+        "truth": 0.7
+    }
+}
