@@ -12,51 +12,64 @@ def load_params(params_file):
     with open(params_file, 'r') as f:
         return json.load(f)
 
-def run_simulation(params):
-    # Initialize components
-    comparator = Comparator(
-        drift_rate=params['drift_rate'],
-        threshold=params['threshold'],
-        noise_std=params['noise_std']
-    )
-    assent_gate = AssentGate()
-    raa = RAA()
-    norm_repo = NormRepository()
-    
-    # Example simulation loop
-    results = []
-    for trial in range(10):  # Example number of trials
-        trial_result = {
-            'trial': trial,
-            'comparator_output': comparator.run_trial(),
-            'assent_gate_output': assent_gate.process_input(1.0),
-            'raa_output': raa.update(1.0)
-        }
-        results.append(trial_result)
-    
+def run_task(task, params, n_trials):
+    """
+    Dispatch to the appropriate NES task simulation.
+
+    Args:
+        task (str): one of 'stroop', 'gng', 'dd', 'moral'
+        params (dict): parameter dictionary loaded from JSON
+        n_trials (int): number of trials to simulate
+
+    Returns:
+        pd.DataFrame: raw trial data
+    """
+    # Example for Stroop; expand for other tasks
+    if task == "stroop":
+        comp = Comparator(**params)
+        results = [comp.run_trial() for _ in range(n_trials)]
+    else:
+        raise ValueError(f"Unknown task: {task}")
     return pd.DataFrame(results)
 
 def main():
-    parser = argparse.ArgumentParser(description='Run NES simulation')
-    parser.add_argument('--task', type=str, required=True, help='Task type (e.g., stroop, gng)')
-    parser.add_argument('--params', type=str, required=True, help='Path to parameter JSON file')
+    parser = argparse.ArgumentParser(
+        description="NES simulation runner (hegemonikon project)"
+    )
+    parser.add_argument("task", help="Which task to run (stroop|gng|dd|moral)")
+    parser.add_argument(
+        "--params", "-p", required=True,
+        help="Path to JSON file with default parameters"
+    )
+    parser.add_argument(
+        "--n-trials", "-n", type=int, default=100,
+        help="Number of trials to run (default: 100)"
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true",
+        help="Print progress messages"
+    )
+
     args = parser.parse_args()
-    
-    # Load parameters
     params = load_params(args.params)
-    
-    # Run simulation
-    df = run_simulation(params)
-    
-    # Create output directory
+
+    if args.verbose:
+        print(f"Running {args.task} for {args.n_trials} trials using {args.params}")
+
+    df = run_task(args.task, params, args.n_trials)
+
     ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     outdir = os.path.join("results", args.task, ts)
     os.makedirs(outdir, exist_ok=True)
-    
-    # Save results
-    df.to_csv(os.path.join(outdir, "raw.csv"), index=False)
-    summary = df.groupby("trial").agg(["mean", "std"])
-    summary.to_csv(os.path.join(outdir, "summary.csv"))
+    raw_fp = os.path.join(outdir, "raw.csv")
+    summary_fp = os.path.join(outdir, "summary.csv")
+
+    df.to_csv(raw_fp, index=False)
+    summary = df.describe().transpose()
+    summary.to_csv(summary_fp)
+
+    if args.verbose:
+        print(f"Saved raw to {raw_fp}, summary to {summary_fp}")
 
 if __name__ == "__main__":
     main()
