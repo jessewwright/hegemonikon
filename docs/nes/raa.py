@@ -1,101 +1,125 @@
+import json
+
 class RAA:
-    def __init__(self, threshold=0.5, max_depth=3, decay_rate=0.8):
+    def __init__(self, params=None):
         """
         Recursive Adjudication Algorithm for conflict monitoring and resolution
         
         Args:
-            threshold (float): Decision threshold for conflict resolution
-            max_depth (int): Maximum recursion depth
-            decay_rate (float): Rate at which conflict signals decay
+            params (dict): Configuration parameters for RAA
         """
-        self.threshold = threshold
-        self.max_depth = max_depth
-        self.decay_rate = decay_rate
-        self.current_depth = 0
-        self.conflict_signals = []
+        # Load default parameters if none provided
+        if params is None:
+            with open("../params/raa_default.json", 'r') as f:
+                params = json.load(f)
+        
+        self.params = params
+        self.current_cycle = 0
+        self.max_cycles = params.get('raa_max_cycles', 3)
+        self.time_trigger_factor = params.get('raa_time_trigger_factor', 0.8)
+        self.urgency_boost = params.get('raa_urgency_boost', 0.5)
         self.decision_history = []
-
-    def _monitor_conflict(self, input_signals):
-        """Monitor for conflicts between input signals"""
-        if len(input_signals) < 2:
-            return False
-            
-        # Calculate conflict intensity
-        signal_diff = max(input_signals) - min(input_signals)
-        return signal_diff > self.threshold
-
-    def _resolve_conflict(self, input_signals):
-        """Resolve conflicts using recursive adjudication"""
-        if self.current_depth >= self.max_depth:
-            # Terminate recursion if max depth reached
-            return self._select_majority(input_signals)
-            
-        # Decay conflict signals
-        decayed_signals = [s * self.decay_rate for s in input_signals]
         
-        # Recursively adjudicate
-        self.current_depth += 1
-        result = self._resolve_conflict(decayed_signals)
-        self.current_depth -= 1
-        
-        return result
-
-    def _select_majority(self, signals):
-        """Select the majority signal when conflicts persist"""
-        return max(signals)
-
-    def update(self, input_signals):
+    def should_engage(self, time, max_time, evidence, threshold):
+        """Determine if RAA should be engaged"""
+        # Check if we're nearing timeout
+        if time >= max_time * self.time_trigger_factor:
+            # Check if decision is imminent
+            if evidence and max(evidence.values()) < threshold * 0.9:
+                return True
+        return False
+    
+    def boost_urgency(self, base_urgency):
+        """Boost urgency based on current cycle count"""
+        return base_urgency + self.urgency_boost * self.current_cycle
+    
+    def update(self, evidence, time, max_time, threshold):
         """
-        Update the RAA with new input signals and perform adjudication
+        Update RAA state and modify evidence accumulation
         
         Args:
-            input_signals (list): List of input signals to process
+            evidence (dict): Current evidence values for each action
+            time (float): Current simulation time
+            max_time (float): Maximum allowed simulation time
+            threshold (float): Current decision threshold
             
         Returns:
-            float: The resolved output signal
+            dict: Modified evidence values and RAA state
         """
-        if not isinstance(input_signals, list):
-            input_signals = [input_signals]
-            
-        self.conflict_signals.append(input_signals)
+        result = {
+            'evidence': evidence,
+            'raa_engaged': False,
+            'raa_cycle': self.current_cycle
+        }
         
-        # Check for conflicts
-        has_conflict = self._monitor_conflict(input_signals)
-        
-        if has_conflict:
-            # Resolve conflicts recursively
-            output = self._resolve_conflict(input_signals)
-        else:
-            # No conflict, take average of signals
-            output = sum(input_signals) / len(input_signals)
+        # Check if RAA should engage
+        if not self.should_engage(time, max_time, evidence, threshold):
+            return result
             
+        # Engage RAA
+        result['raa_engaged'] = True
+        self.current_cycle += 1
+        
+        # Apply RAA effects
+        for action in evidence.keys():
+            # Boost urgency
+            evidence[action] += self.urgency_boost * self.current_cycle
+            
+            # Apply noise boost if configured
+            if 'raa_noise_boost' in self.params:
+                noise = np.random.normal(0, self.params['raa_noise_boost'])
+                evidence[action] += noise
+                
+            # Apply threshold collapse if configured
+            if 'raa_threshold_collapse_rate' in self.params:
+                threshold *= (1 - self.params['raa_threshold_collapse_rate'])
+                
+        result['evidence'] = evidence
+        result['threshold'] = threshold
+        
+        # Track decision history
         self.decision_history.append({
-            'input_signals': input_signals,
-            'has_conflict': has_conflict,
-            'output': output
+            'time': time,
+            'cycle': self.current_cycle,
+            'evidence': evidence.copy(),
+            'threshold': threshold
         })
         
-        return output
-
+        return result
+    
+    def reset(self):
+        """Reset RAA state for new trial"""
+        self.current_cycle = 0
+        self.decision_history = []
+    
     def get_decision_history(self):
         """Get the history of RAA decisions"""
         return self.decision_history
 
 if __name__ == "__main__":
     # Example usage
-    raa = RAA(threshold=0.5, max_depth=3, decay_rate=0.8)
+    params = {
+        'raa_max_cycles': 3,
+        'raa_time_trigger_factor': 0.8,
+        'raa_urgency_boost': 0.5,
+        'raa_noise_boost': 0.2,
+        'raa_threshold_collapse_rate': 0.1
+    }
     
-    # Test with conflicting signals
-    print("Test with conflicting signals:")
-    output = raa.update([0.9, 0.4, 0.6])
-    print(f"Output: {output}")
+    raa = RAA(params)
     
-    # Test with non-conflicting signals
-    print("\nTest with non-conflicting signals:")
-    output = raa.update([0.3, 0.35, 0.32])
-    print(f"Output: {output}")
+    # Simulate multiple cycles
+    evidence = {'action1': 0.5, 'action2': 0.4}
+    print("Initial evidence:", evidence)
+    
+    for cycle in range(3):
+        print(f"\nCycle {cycle + 1}:")
+        result = raa.update(evidence, time=2.0, max_time=3.0, threshold=1.0)
+        print(f"Updated evidence: {result['evidence']}")
+        print(f"RAA engaged: {result['raa_engaged']}")
+        print(f"Cycle count: {result['raa_cycle']}")
     
     # Show decision history
     print("\nDecision History:")
     for entry in raa.get_decision_history():
-        print(f"Input: {entry['input_signals']}, Has Conflict: {entry['has_conflict']}, Output: {entry['output']}")
+        print(f"Time: {entry['time']}, Cycle: {entry['cycle']}, Evidence: {entry['evidence']}")

@@ -1,0 +1,8 @@
+{
+    "raa_max_cycles": 3,
+    "raa_time_trigger_factor": 0.8,
+    "raa_urgency_boost": 0.5,
+    "raa_noise_boost": 0.2,
+    "raa_threshold_collapse_rate": 0.1,
+    "raa_base_time_cost": 0.05
+}
