@@ -119,7 +119,7 @@ norm_adherent_action = 'Action_A' # Action associated with the norm weight m_j
 
 # --- SELECT CONDITION ---
 # Choose 'standard' or 'entrenched'
-condition_to_run = 'standard' # CHANGE TO 'entrenched' TO RUN THE OTHER CONDITION
+condition_to_run = 'entrenched' # Changed to run the entrenched condition
 
 if condition_to_run == 'standard':
     N_TRIALS_PHASE1 = 150
