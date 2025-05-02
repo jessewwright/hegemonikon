@@ -1,4 +1,5 @@
 import json
+import numpy as np
 
 class RAA:
     def __init__(self, params=None):

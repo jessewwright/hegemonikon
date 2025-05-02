@@ -1,0 +1,40 @@
+## GNG Simulation Notes (Note-to-Self)
+
+---
+
+### 2025-05-02
+**Task:** Initial Go/No‑Go sweep at baseline serotonin (0.0)
+- **Parameters:**
+  - These sweep values were defined in `sim_gng.py` overrides (inline BASE_PARAMS_GNG updates).
+  - Inhibitory strength: [-0.7, -0.3]  
+  - Noise std dev: [0.05, 0.10]  
+  - Trials per cell: 1000
+
+**Results** (summary):**
+- inh=-0.7 & noise=0.05 → Hit Rate 0.98, FA Rate 0.112, Mean RT ~0.724s
+- inh=-0.7 & noise=0.10 → Hit Rate 0.974, FA Rate 0.125, Mean RT ~0.735s
+- inh=-0.3 & noise=0.05 → Hit Rate 0.987, FA Rate 0.057, Mean RT ~0.715s
+- inh=-0.3 & noise=0.10 → Hit Rate 0.973, FA Rate 0.086, Mean RT ~0.739s
+
+**Action Taken:**
+- Identified plausible FA rates in 5–15% range.
+- Confirmed SAT trade‑off: higher noise or weaker inhibition ↑ FA, ↑ RT.
+
+**Action Taken:**
+- Identified plausible FA rates in 5–15% range.
+- Confirmed SAT trade‑off: higher noise or weaker inhibition ↑ FA, ↑ RT.
+- **Milestone 1.1 Complete:** Tuned inhibitory_strength and noise_std_dev to yield FA rates within target range at baseline serotonin.
+
+**Next Steps:**
+1. Sweep serotonin levels at [0.5, 1.0] to check threshold effects.
+2. Zoom in on inhibition around -0.5, noise around 0.08 if needed.
+3. Plot RT distributions (skew, error vs. correct) for detailed analysis.
+
+---
+
+**Version Control Guidance:**
+- Commit the simulation **code**, **parameter config files**, and **summary tables** to Git. Avoid large raw data files (e.g., full CSV logs) in Git; instead store them in a data directory excluded by `.gitignore` or track via a data versioning tool (DVC).
+- Tag commits with the date and sweep details (e.g., `gng-sweep-baseline-ser-0.0`) to maintain reproducibility.
+
+*End of entry.*
+
