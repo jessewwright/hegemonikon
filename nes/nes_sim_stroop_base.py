@@ -11,111 +11,101 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-# Import NES components (assuming they are in the nes directory)
-# Adjust imports based on your actual class/file names if they differ
+# --- Import NES components ---
 try:
-    from nes.nes_agent import NESAgent # Assuming you have a central agent class
-    # If not using an agent class, import individual components:
-    # from nes.comparator import Comparator
-    # from nes.assent_gate import AssentGate
+    # Now importing the *correct* comparator and the *fixed* assent_gate
+    from nes.comparator import Comparator
+    from nes.assent_gate import AssentGate
+    print("Successfully imported individual NES components.")
 except ImportError as e:
     print(f"Error importing NES components: {e}")
-    print("Make sure nes_agent.py (or individual component files) exists in the nes/ directory.")
+    print("Check that comparator.py and assent_gate.py exist in nes/ and contain the classes.")
+    sys.exit(1)
+except Exception as e:
+    print(f"An unexpected error occurred during import: {e}") # Catch other potential errors
     sys.exit(1)
 
 # --- Simulation Parameters (from Sim Report v3, Sec 3.2 & Appendix) ---
 # Best-fit parameters for Stroop with collapsing bound
 params = {
-    'w_s': 1.135,                # Salience weight
-    'w_n': 0.348,                # Norm-congruence weight (task rule: "say color")
-    'w_u': 0.0,                  # Urgency weight (report appendix mentions urgency=0.05 s⁻¹ - unclear if this is w_u or integrated differently)
-    'noise_std_dev': 0.420,      # Noise sigma
-    'base_threshold': 1.263,     # Initial decision threshold
-    'dt': 0.01,                  # Simulation timestep (s)
-    'max_time': 3.0,             # Max decision time (s) - Adjust if needed, report doesn't specify exact value used for fit
-
-    # Collapsing Bound Parameters (NEEDS IMPLEMENTATION)
-    # The report mentions a collapsing bound was used, but not the formula.
-    # Let's assume a linear collapse for now.
-    'collapse_type': 'linear', # 'linear', 'exponential', or 'none'
-    'collapse_rate': 1.263 / 3.0, # Example: Collapse from base_threshold to 0 over max_time
-
-    # Stroop Specific Inputs (Hypothesized - Adjust as needed)
-    # Assuming 2 impulses: [Say Color, Say Word]
-    # Norm always favors "Say Color" (index 0)
-    'norm_strength': 1.0,        # Strength of normative input N
-    # Salience depends on congruency
-    'salience_congruent': np.array([1.0, 0.1]), # Strong for color, weak for word
-    'salience_incongruent': np.array([0.1, 1.0]), # Weak for color, strong for word (the conflict)
-
-    # RAA Parameters (Likely not needed for basic Stroop, but good practice)
-    'raa_time_trigger_factor': 0.6, # Example
-    'raa_max_cycles': 0, # Disable RAA for this basic run
-    'raa_urgency_boost': 0.0 # Disable RAA for this basic run
+    'w_s': 1.135,
+    'w_n': 1.0,
+    'w_u': 0.0,
+    'noise_std_dev': 0.30,
+    'base_threshold': 1.6,
+    'dt': 0.01,
+    'max_time': 3.0,
+    'collapse_type': 'linear',
+    'collapse_rate': 1.6 / 3.0,  # Recalculated for Th=1.6
+    'actions': ['speak_color', 'speak_word'],
+    'correct_action': 'speak_color',
+    'norm_strength': 1.0,
+    'raa_time_trigger_factor': 0.6,
+    'raa_max_cycles': 0,
+    'raa_urgency_boost': 0.0
 }
 
 N_TRIALS_PER_CONDITION = 500 # Number of trials for congruent and incongruent
 
 # --- Helper Functions ---
 
-def get_collapsing_threshold(t, base_threshold, max_time, collapse_type='linear', collapse_rate=0.0):
+def get_collapsing_threshold(t, base_threshold, collapse_rate):
     """Calculates the threshold at time t based on the collapse type."""
-    if collapse_type == 'linear':
+    if collapse_rate == 0.0:
+        return base_threshold
+    else:
         threshold = base_threshold - collapse_rate * t
         return max(threshold, 0.01) # Don't let threshold go to zero or negative
-    elif collapse_type == 'exponential':
-        # Example: threshold = base_threshold * np.exp(-collapse_rate * t)
-        raise NotImplementedError("Exponential collapse not implemented yet.")
-    else: # 'none'
-        return base_threshold
 
-def run_single_trial(agent, trial_type, params):
-    """Runs a single Stroop trial using the NESAgent."""
+def run_single_trial(comparator, assent_gate, trial_type, params):
+    """Runs a single Stroop trial using individual NES components."""
     start_time = time.time()
 
-    # --- Prepare Inputs based on Trial Type ---
+    # --- Define Action Attributes for this Trial ---
+    actions = params['actions']
+    action_attributes = {}
     if trial_type == 'congruent':
-        salience_input = params['salience_congruent']
-        correct_choice_idx = 0 # Index 0 is "Say Color"
+        # High salience (S) for correct action (color), low for incorrect (word)
+        # Norm (N) aligns with correct action for both (task demands speaking color)
+        action_attributes = {
+            'speak_color': {'S': 1.0, 'N': +params['norm_strength'], 'U': params['w_u']},
+            'speak_word':  {'S': 0.1, 'N': -params['norm_strength'], 'U': params['w_u']} # Word matches color, but norm opposes saying word
+        }
+        correct_choice = 'speak_color'
     elif trial_type == 'incongruent':
-        salience_input = params['salience_incongruent']
-        correct_choice_idx = 0 # Index 0 is "Say Color"
+        # High salience (S) for incorrect action (word), low for correct (color)
+        # Norm (N) still favors correct action (color)
+        action_attributes = {
+            'speak_color': {'S': 0.1, 'N': +params['norm_strength'], 'U': params['w_u']},
+            'speak_word':  {'S': 1.0, 'N': -params['norm_strength'], 'U': params['w_u']} # High salience word conflicts with norm
+        }
+        correct_choice = 'speak_color'
     else:
         raise ValueError("Unknown trial_type")
 
-    # Normative input: Assume favors index 0 ("Say Color")
-    # Positive value means congruent with norm, negative means violates
-    # Example: [Norm for action 0, Norm for action 1]
-    norm_input = np.array([params['norm_strength'], -params['norm_strength']]) # SayColor=Good, SayWord=Bad
-
-    # Urgency input (assuming constant for now, could be dynamic)
-    urgency_input = np.array([params['w_u'], params['w_u']]) # Same urgency for both options
-
-    # --- Reset Agent State (if necessary) ---
-    # agent.reset() # Implement this method in NESAgent if needed
+    # --- Initialize Comparator for Trial ---
+    comparator.initialize_actions(actions) # Set up accumulators
 
     # --- Run Simulation Loop ---
     accumulated_time = 0.0
     decision = None
-    evidence_history = [] # Optional: for plotting trajectories
+    evidence_history = [] # Optional
 
     while accumulated_time < params['max_time']:
-        # Get current threshold (potentially collapsing)
+        # 1. Get current threshold
         current_threshold = get_collapsing_threshold(
             accumulated_time,
             params['base_threshold'],
-            params['max_time'],
-            params['collapse_type'],
             params['collapse_rate']
         )
-        agent.assent_gate.set_threshold(current_threshold) # Assuming AssentGate has this method
 
-        # Agent takes a step
-        # This depends heavily on your NESAgent implementation
-        # It should internally call comparator.update, check assent_gate, etc.
-        # We expect it to return a decision index or None if no decision yet
-        decision, current_evidence = agent.step(salience_input, norm_input, urgency_input, params['dt'])
-        evidence_history.append(current_evidence) # Store evidence state
+        # 2. Update Comparator evidence by one step
+        # Pass the attributes dict and the global params dict (for weights w_s, w_n, w_u)
+        current_evidence = comparator.step(action_attributes, params)
+        evidence_history.append(current_evidence)
+
+        # 3. Check Assent Gate
+        decision = assent_gate.check(current_evidence, current_threshold)
 
         if decision is not None:
             break # Decision reached
@@ -128,7 +118,7 @@ def run_single_trial(agent, trial_type, params):
     timeout = (decision is None)
     accuracy = 0
     if not timeout:
-        accuracy = 1 if choice == correct_choice_idx else 0
+        accuracy = 1 if choice == correct_choice else 0
 
     end_time = time.time()
     compute_time = end_time - start_time
@@ -148,28 +138,24 @@ if __name__ == "__main__":
     print("Starting NES Stroop Simulation (Base Run with Fitted Params)")
     print(f"Parameters: {params}")
 
-    # Initialize the NES Agent
-    # This needs to match your NESAgent class constructor
+    # --- Initialize the NES Components Individually ---
     try:
-        # Pass relevant parameters to the agent
-        agent = NESAgent(
-            num_choices=2, # Say Color vs Say Word
-            w_s=params['w_s'],
-            w_n=params['w_n'],
-            # w_u might be handled inside the agent or passed per step
-            noise_std_dev=params['noise_std_dev'],
-            base_threshold=params['base_threshold'],
+        # COMPARTOR: Use the correct constructor (dt, noise_std_dev)
+        comparator = Comparator(
             dt=params['dt'],
-            max_time=params['max_time'],
-            raa_time_trigger_factor=params['raa_time_trigger_factor'],
-            raa_max_cycles=params['raa_max_cycles'],
-            raa_urgency_boost=params['raa_urgency_boost']
-            # Add other necessary params...
+            noise_std_dev=params['noise_std_dev']
         )
-        print("NES Agent initialized.")
+
+        # ASSENT GATE: Use the fixed constructor (base_threshold)
+        assent_gate = AssentGate(
+            base_threshold=params['base_threshold']
+        )
+
+        print("NES Components (Comparator, AssentGate) initialized.")
+
     except Exception as e:
-        print(f"Error initializing NESAgent: {e}")
-        print("Check the NESAgent constructor and required parameters.")
+        print(f"Error initializing NES Components: {e}")
+        print("Check component constructors (Comparator, AssentGate) and required parameters.")
         sys.exit(1)
 
 
@@ -178,7 +164,7 @@ if __name__ == "__main__":
     # Run Congruent Trials
     print(f"\nRunning {N_TRIALS_PER_CONDITION} Congruent trials...")
     for i in range(N_TRIALS_PER_CONDITION):
-        result = run_single_trial(agent, 'congruent', params)
+        result = run_single_trial(comparator, assent_gate, 'congruent', params)
         all_results.append(result)
         if (i + 1) % 100 == 0:
             print(f"  Completed {i+1}/{N_TRIALS_PER_CONDITION} trials.")
@@ -186,7 +172,7 @@ if __name__ == "__main__":
     # Run Incongruent Trials
     print(f"\nRunning {N_TRIALS_PER_CONDITION} Incongruent trials...")
     for i in range(N_TRIALS_PER_CONDITION):
-        result = run_single_trial(agent, 'incongruent', params)
+        result = run_single_trial(comparator, assent_gate, 'incongruent', params)
         all_results.append(result)
         if (i + 1) % 100 == 0:
             print(f"  Completed {i+1}/{N_TRIALS_PER_CONDITION} trials.")
