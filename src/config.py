@@ -1,56 +1,20 @@
-"""
-Configuration settings for MVNES GNG simulation.
-"""
+# Filename: src/config.py
+# Configuration variables for MVNES Go/No-Go simulation
 
-class Config:
-    def __init__(self):
-        """
-        Initialize simulation configuration parameters.
-        """
-        # Agent parameters
-        self.agent_type = "mvnes"  # 'mvnes' or 'baseline'
-        self.learning_rate = 0.1
-        self.temperature = 1.0
-        self.random_policy = False
-        
-        # Environment parameters
-        self.trial_count = 100
-        self.block_size = 20
-        self.reward_magnitude = 1.0
-        self.stimulus_types = ['go', 'no-go']
-        
-        # Simulation parameters
-        self.seed = None
-        self.verbose = True
-        self.output_dir = "data"
-        
-        # Block structure
-        self.block_types = ['go', 'no-go', 'mixed']
-        self.block_order = []
-        
-        # Performance tracking
-        self.track_metrics = ['accuracy', 'reaction_time', 'choice_history']
-        
-    def set_block_order(self, order):
-        """
-        Set the block order for the simulation.
-        
-        Args:
-            order: List of block types in sequence
-        """
-        self.block_order = order
-        
-    def validate(self):
-        """
-        Validate configuration parameters.
-        
-        Returns:
-            bool: True if configuration is valid
-        """
-        if self.trial_count < self.block_size:
-            raise ValueError("Trial count must be greater than or equal to block size")
-        if self.learning_rate < 0 or self.learning_rate > 1:
-            raise ValueError("Learning rate must be between 0 and 1")
-        if self.temperature <= 0:
-            raise ValueError("Temperature must be greater than 0")
-        return True
+# DDM Parameters
+THRESHOLD_A = 0.5       # Decision threshold boundary 'a'
+W_S = 0.6               # Salience weight
+W_N = 0.8               # Norm weight (set > W_S for successful inhibition in basic model)
+T_NONDECISION = 0.1     # Non-decision time 't'
+NOISE_STD_DEV = 0.2     # Base noise sigma
+DT = 0.01               # Simulation time step
+MAX_TIME = 2.0          # Max reaction time allowed
+
+# Task Parameters
+N_TRIALS = 200          # Total number of trials
+P_GO_TRIAL = 0.7        # Probability of a Go trial (vs NoGo)
+
+# Affect Modulation (Optional - values for future use)
+AFFECT_STRESS_THRESHOLD_REDUCTION = -0.1 # How much stress reduces threshold
+
+# Add other parameters as needed...
