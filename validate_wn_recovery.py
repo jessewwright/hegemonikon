@@ -1,49 +1,60 @@
 # Filename: validate_wn_recovery.py
 # Purpose: Test parameter recovery for w_n under simplified, controlled conditions
-#          using ABC-SMC and rich summary statistics.
+#          using ABC-SMC and rich summary statistics, incorporating best practices.
 
 import sys
-# Assuming the script is in the root project directory
-# Adjust if placed elsewhere (e.g., scripts/)
-sys.path.append('src')
-
 import numpy as np
 import pandas as pd
 from functools import partial
-import pyabc
-from pyabc import Distribution, RV, ABCSMC, PNormDistance # Ensure PNormDistance is imported if used directly
-import tempfile
 import matplotlib.pyplot as plt
 import time
 import os
+import tempfile
+from pathlib import Path
 
-# --- Local Imports ---
+# --- 1. Robust Imports & Dependency Checks ---
 try:
+    # Dynamically add 'src' to path based on script location
+    script_dir = Path(__file__).resolve().parent
+    src_dir = script_dir / 'src'
+    sys.path.insert(0, str(src_dir))
+
     from agent_mvnes import MVNESAgent
-except ImportError:
-    print("ERROR: Could not import MVNESAgent from src.agent_mvnes. Ensure script is run from project root or adjust PYTHONPATH.")
+    # Import necessary fixed parameters (or define defaults)
+    try:
+        from agent_config import T_NONDECISION, NOISE_STD_DEV, DT, MAX_TIME
+    except ImportError:
+        print("Warning: Could not import agent_config. Using default simulation parameters.")
+        T_NONDECISION = 0.1
+        NOISE_STD_DEV = 0.2 # Using a more realistic noise value
+        DT = 0.01
+        MAX_TIME = 2.0
+
+except ImportError as e:
+    print(f"ERROR: Failed to import necessary modules: {e}")
+    print("Ensure this script is in the project root or adjust paths.")
+    print("Make sure 'src/agent_mvnes.py' and 'src/agent_config.py' exist.")
     sys.exit(1)
-# Import necessary fixed parameters (or define defaults)
+
 try:
-    from agent_config import T_NONDECISION, NOISE_STD_DEV, DT, MAX_TIME
+    import pyabc
+    from pyabc import Distribution, RV, ABCSMC
 except ImportError:
-    print("Warning: Could not import agent_config. Using default simulation parameters.")
-    T_NONDECISION = 0.1
-    NOISE_STD_DEV = 0.2 # Using a more realistic noise value than 1.0 might be better
-    DT = 0.01
-    MAX_TIME = 2.0
+    print("ERROR: pyabc library not found.")
+    print("Please install it: pip install pyabc")
+    sys.exit(1)
 
-# --- Configuration ---
-N_TRIALS_PER_WN = 300   # Number of trials per w_n value (Increase for better stats)
-WN_GRID = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4] # Grid of true w_n values to test
-TRUE_A = 1.0            # Fixed threshold value (Adjust as needed)
-TRUE_W_S = 0.7          # Fixed salience weight (Adjust as needed)
-P_HIGH_CONFLICT = 0.5   # Probability of a high-conflict trial
+# --- 2. Configuration & Constants ---
 
-# ABC Configuration
-ABC_POPULATION_SIZE = 200 # Smaller for faster testing, increase for accuracy
-ABC_MAX_NR_POPULATIONS = 8
-ABC_MIN_EPSILON = 0.01 # Adjust based on observed distances
+# Reproducibility
+GLOBAL_SEED = 42
+np.random.seed(GLOBAL_SEED)
+
+# Simulation Parameters
+N_TRIALS_PER_WN = 300   # Number of trials per w_n value
+WN_GRID = [0.2, 0.5, 0.8, 1.1, 1.4] # Grid of true w_n values to test
+TRUE_A = 1.0            # Fixed threshold value
+TRUE_W_S = 0.7          # Fixed salience weight
 
 # Define base simulation parameters (excluding w_n, a, w_s)
 BASE_SIM_PARAMS = {
@@ -51,54 +62,86 @@ BASE_SIM_PARAMS = {
     'noise_std_dev': NOISE_STD_DEV,
     'dt': DT,
     'max_time': MAX_TIME,
-    # Add other necessary params from agent_mvnes if they aren't defaulted
-    'affect_stress_threshold_reduction': -0.3 # Example, ensure it's used if needed
+    # Add other necessary params consistently used by run_mvnes_trial
 }
 
-# --- Helper Functions ---
+# Simplified Task Parameters
+P_HIGH_CONFLICT = 0.5   # Probability of a high-conflict trial
+# Define inputs for the two trial types
+NEUTRAL_SALIENCE = 1.0
+NEUTRAL_NORM = 0.0
+CONFLICT_SALIENCE = 1.0 # Assume Go drive is present
+CONFLICT_NORM = 1.0     # Norm opposes Go drive
 
-def simulate_summary(params_abc, fixed_params, salience_inputs, norm_inputs):
-    """
-    Simulates N trials using fixed inputs and returns rich summary statistics.
-    'params_abc' contains the parameter(s) being estimated by ABC (here, just w_n).
-    'fixed_params' contains other fixed model parameters (a, w_s, t, noise, etc.).
-    """
-    # Combine parameters: the ones from ABC + the fixed ones
-    full_params = {**fixed_params, **params_abc}
+# ABC Configuration
+# Use smaller pop size for quicker testing, increase for final runs
+ABC_POPULATION_SIZE = 150
+ABC_MAX_NR_POPULATIONS = 10 # Allow more generations if needed
+ABC_MIN_EPSILON = 0.01 # Target epsilon
 
-    # Initialize arrays
+# --- 3. Core Functions (Modular Structure) ---
+
+def generate_trial_inputs(n_trials, p_conflict):
+    """Generates fixed arrays of salience and norm inputs for the simplified task."""
+    salience_inputs = np.zeros(n_trials)
+    norm_inputs = np.zeros(n_trials)
+    trial_types = []
+    for i in range(n_trials):
+        if np.random.rand() < p_conflict:
+            salience_inputs[i] = CONFLICT_SALIENCE
+            norm_inputs[i] = CONFLICT_NORM
+            trial_types.append("Conflict")
+        else:
+            salience_inputs[i] = NEUTRAL_SALIENCE
+            norm_inputs[i] = NEUTRAL_NORM
+            trial_types.append("Neutral")
+    return salience_inputs, norm_inputs, trial_types
+
+def simulate_trials(params_dict, salience_inputs, norm_inputs):
+    """
+    Simulates N trials for a given parameter set using fixed inputs.
+    Returns a DataFrame of trial results.
+    """
     n_sim_trials = len(salience_inputs)
-    rts = np.zeros(n_sim_trials)
-    choices = np.zeros(n_sim_trials, dtype=int)
+    results_list = []
+    # Ensure agent is instantiated fresh or properly reset if stateful
+    agent = MVNESAgent(config={}) # Assuming stateless for run_mvnes_trial
 
-    # Simulate trials
-    # Creating a new agent instance each time *can* be slow.
-    # If performance is critical, initialize agent outside and pass as arg,
-    # but ensure no state leaks between simulations if agent has internal state.
-    agent = MVNESAgent(config={}) # Assuming agent is stateless per trial run
     for i in range(n_sim_trials):
-        # Ensure parameters passed to run_mvnes_trial are exactly what it expects
-        # Specifically, check if it needs 'threshold_a' or just 'a' etc.
-        # Assuming it needs 'threshold_a', 'w_s', 'w_n', and others from BASE_SIM_PARAMS
-        trial_params_for_agent = {
-            'w_n': full_params['w_n'],
-            'threshold_a': full_params['a'], # Use 'a' from fixed_params
-            'w_s': full_params['w_s'],       # Use 'w_s' from fixed_params
-            **BASE_SIM_PARAMS                # Add other necessary params like t, noise, etc.
+        # run_mvnes_trial expects 'threshold_a' key
+        params_for_agent = {
+            'w_n': params_dict['w_n'],
+            'threshold_a': params_dict['a'],
+            'w_s': params_dict['w_s'],
+            **BASE_SIM_PARAMS
         }
-        result = agent.run_mvnes_trial(
+        trial_result = agent.run_mvnes_trial(
             salience_input=salience_inputs[i],
             norm_input=norm_inputs[i],
-            params=trial_params_for_agent # Pass the combined dictionary
+            params=params_for_agent
         )
-        rt, ch = result['rt'], result['choice']
-        rts[i], choices[i] = rt, ch
+        results_list.append({
+            'rt': trial_result['rt'],
+            'choice': trial_result['choice']
+            # Add trial type if needed for conditional stats later
+        })
+    return pd.DataFrame(results_list)
 
-    # --- Calculate Rich Summary Statistics ---
+def calculate_summary_stats(df_results):
+    """
+    Calculates a rich set of summary statistics from trial data (DataFrame).
+    Handles cases with no trials or only one choice type robustly.
+    """
     summaries = {}
+    n_sim_trials = len(df_results)
 
-    # Handle cases with no trials (shouldn't happen here, but good practice)
-    if n_sim_trials == 0: return {k: np.nan for k in get_summary_stat_keys()} # Define this helper if needed
+    if n_sim_trials == 0: # Handle empty dataframe
+        # Return dict with NaN for all expected keys
+        keys = get_summary_stat_keys() # Need helper function defining keys
+        return {k: np.nan for k in keys}
+
+    rts = df_results['rt'].values
+    choices = df_results['choice'].values
 
     # Separate RTs by choice
     choice_1_rts = rts[choices == 1]
@@ -111,333 +154,375 @@ def simulate_summary(params_abc, fixed_params, salience_inputs, norm_inputs):
     summaries["n_choice_0"] = n_choice_0
     summaries["choice_rate"] = n_choice_1 / n_sim_trials if n_sim_trials > 0 else np.nan
 
-    # Define statistics to calculate (to avoid repetition)
+    # Define statistics calculation functions (with NaN handling)
+    def safe_stat(data, func, min_len=1, check_std=False):
+        if len(data) < min_len: return np.nan
+        if check_std and np.std(data) == 0: return np.nan # Avoid division by zero for skew
+        try: return func(data)
+        except Exception: return np.nan
+
     stat_funcs = {
-        "rt_mean": np.mean,
-        "rt_median": np.median,
-        "rt_var": np.var,
-        "rt_skew": lambda x: np.nan if len(x) < 3 or np.std(x) == 0 else np.mean((x - np.mean(x))**3) / np.std(x)**3,
-        "rt_q10": lambda x: np.nanpercentile(x, 10),
-        "rt_q30": lambda x: np.nanpercentile(x, 30),
-        "rt_q50": lambda x: np.nanpercentile(x, 50),
-        "rt_q70": lambda x: np.nanpercentile(x, 70),
-        "rt_q90": lambda x: np.nanpercentile(x, 90),
-        "rt_min": np.min,
-        "rt_max": np.max,
-        "rt_range": lambda x: np.max(x) - np.min(x)
+        "rt_mean": partial(safe_stat, func=np.mean),
+        "rt_median": partial(safe_stat, func=np.median),
+        "rt_var": partial(safe_stat, func=np.var),
+        "rt_skew": partial(safe_stat, func=lambda x: np.mean((x - np.mean(x))**3) / np.std(x)**3, min_len=3, check_std=True),
+        "rt_q10": partial(safe_stat, func=lambda x: np.nanpercentile(x, 10)),
+        "rt_q30": partial(safe_stat, func=lambda x: np.nanpercentile(x, 30)),
+        "rt_q50": partial(safe_stat, func=lambda x: np.nanpercentile(x, 50)),
+        "rt_q70": partial(safe_stat, func=lambda x: np.nanpercentile(x, 70)),
+        "rt_q90": partial(safe_stat, func=lambda x: np.nanpercentile(x, 90)),
+        "rt_min": partial(safe_stat, func=np.min),
+        "rt_max": partial(safe_stat, func=np.max),
+        "rt_range": partial(safe_stat, func=lambda x: np.max(x) - np.min(x))
     }
 
     # Calculate overall stats
     for name, func in stat_funcs.items():
-        try:
-            summaries[name] = func(rts) if len(rts) > 0 else np.nan
-        except Exception:
-            summaries[name] = np.nan
+        summaries[name] = func(rts)
 
     # Calculate choice=1 stats
     for name, func in stat_funcs.items():
-        key = f"choice_1_{name}"
-        try:
-            summaries[key] = func(choice_1_rts) if n_choice_1 > 0 else np.nan
-        except Exception:
-            summaries[key] = np.nan
+        summaries[f"choice_1_{name}"] = func(choice_1_rts)
 
     # Calculate choice=0 stats
     for name, func in stat_funcs.items():
-        key = f"choice_0_{name}"
-        try:
-            summaries[key] = func(choice_0_rts) if n_choice_0 > 0 else np.nan
-        except Exception:
-            summaries[key] = np.nan
+        summaries[f"choice_0_{name}"] = func(choice_0_rts)
 
     # Add RT histogram bins
     try:
         if len(rts) > 0:
-            rt_min_val = np.min(rts)
-            rt_max_val = np.max(rts)
-            # Avoid histogram error if min==max
+            rt_min_val, rt_max_val = np.min(rts), np.max(rts)
             hist_range = (rt_min_val, rt_max_val) if rt_max_val > rt_min_val else (rt_min_val - 0.1, rt_max_val + 0.1)
             hist, _ = np.histogram(rts, bins=10, range=hist_range, density=True)
             summaries.update({f"rt_bin_{i}": hist[i] for i in range(10)})
         else:
-             summaries.update({f"rt_bin_{i}": np.nan for i in range(10)})
+            summaries.update({f"rt_bin_{i}": np.nan for i in range(10)})
     except Exception:
-         summaries.update({f"rt_bin_{i}": np.nan for i in range(10)})
+        summaries.update({f"rt_bin_{i}": np.nan for i in range(10)})
 
     return summaries
 
+def get_summary_stat_keys():
+    """Helper function to define the expected keys in summary dicts."""
+    # Define based on the keys created in calculate_summary_stats
+    keys = ["n_choice_1", "n_choice_0", "choice_rate"]
+    stat_names = ["rt_mean", "rt_median", "rt_var", "rt_skew", "rt_q10",
+                  "rt_q30", "rt_q50", "rt_q70", "rt_q90", "rt_min",
+                  "rt_max", "rt_range"]
+    keys.extend(stat_names) # Overall
+    keys.extend([f"choice_1_{s}" for s in stat_names]) # Choice 1
+    keys.extend([f"choice_0_{s}" for s in stat_names]) # Choice 0
+    keys.extend([f"rt_bin_{i}" for i in range(10)]) # Histogram
+    return keys
 
 def weighted_distance(sim_summary, obs_summary):
     """
     Calculate weighted Euclidean distance between summary statistics dictionaries.
-    Handles NaNs robustly.
+    Handles NaNs robustly by assigning a large penalty.
     """
     # Define weights (adjust these based on sensitivity analysis/importance)
+    # Example weights - refine these!
     weights = {
-        "choice_rate": 2.0,
-        "rt_mean": 1.0, "rt_var": 1.0, "rt_median": 1.0, "rt_skew": 1.0,
+        "choice_rate": 3.0, # Higher weight
+        "rt_mean": 1.0, "rt_var": 1.0, "rt_median": 1.0, "rt_skew": 0.5,
         "rt_q10": 1.0, "rt_q30": 1.0, "rt_q50": 1.0, "rt_q70": 1.0, "rt_q90": 1.0,
-        "rt_min": 0.5, "rt_max": 0.5, "rt_range": 0.5,
+        "rt_min": 0.2, "rt_max": 0.2, "rt_range": 0.2,
 
         "choice_1_rt_mean": 1.5, "choice_1_rt_median": 1.5, "choice_1_rt_var": 1.5,
-        "choice_1_rt_skew": 1.5, "choice_1_rt_q10": 1.5, "choice_1_rt_q30": 1.5,
+        "choice_1_rt_skew": 0.75, "choice_1_rt_q10": 1.5, "choice_1_rt_q30": 1.5,
         "choice_1_rt_q50": 1.5, "choice_1_rt_q70": 1.5, "choice_1_rt_q90": 1.5,
-        "choice_1_rt_min": 0.75, "choice_1_rt_max": 0.75, "choice_1_rt_range": 0.75,
+        "choice_1_rt_min": 0.3, "choice_1_rt_max": 0.3, "choice_1_rt_range": 0.3,
 
         "choice_0_rt_mean": 1.5, "choice_0_rt_median": 1.5, "choice_0_rt_var": 1.5,
-        "choice_0_rt_skew": 1.5, "choice_0_rt_q10": 1.5, "choice_0_rt_q30": 1.5,
+        "choice_0_rt_skew": 0.75, "choice_0_rt_q10": 1.5, "choice_0_rt_q30": 1.5,
         "choice_0_rt_q50": 1.5, "choice_0_rt_q70": 1.5, "choice_0_rt_q90": 1.5,
-        "choice_0_rt_min": 0.75, "choice_0_rt_max": 0.75, "choice_0_rt_range": 0.75,
+        "choice_0_rt_min": 0.3, "choice_0_rt_max": 0.3, "choice_0_rt_range": 0.3,
 
         "n_choice_1": 1.0, "n_choice_0": 1.0,
 
-        **{f"rt_bin_{i}": 0.5 for i in range(10)} # Add weights for histogram bins
+        **{f"rt_bin_{i}": 0.1 for i in range(10)} # Lower weight for hist bins
     }
+    # Define a large penalty for NaN differences
+    nan_penalty_squared = 1000.0**2
 
-    total_distance = 0.0
-    valid_keys_count = 0
+    total_distance_sq = 0.0
+    keys_used = 0
 
-    # Iterate through keys present in the observed summary
-    for key in obs_summary.keys():
-        # Only compare if key is also in simulated summary and has a weight
-        if key in sim_summary and key in weights:
-            obs_val = obs_summary[key]
-            sim_val = sim_summary[key]
+    # Use union of keys to ensure we try to compare all stats
+    all_keys = set(sim_summary.keys()) | set(obs_summary.keys())
 
-            # Skip if observed value is NaN (cannot compare)
+    for key in all_keys:
+        if key in weights: # Only compare stats we have weights for
+            obs_val = obs_summary.get(key, np.nan)
+            sim_val = sim_summary.get(key, np.nan)
+
+            # Skip if observed is NaN (no target to compare against)
             if np.isnan(obs_val):
                 continue
 
-            # If simulated value is NaN, assign large penalty
+            weight = weights[key]
             if np.isnan(sim_val):
-                dist = weights[key] * (1000**2) # Large penalty squared
+                # Apply large penalty if simulation failed to produce stat
+                dist_sq = weight * nan_penalty_squared
             else:
                 # Calculate weighted squared difference
-                # Normalize by observed value to handle different scales? Optional.
-                # For now, simple weighted squared difference:
                 diff = obs_val - sim_val
-                dist = weights[key] * (diff**2)
+                dist_sq = weight * (diff**2)
 
-            total_distance += dist
-            valid_keys_count += 1
+            total_distance_sq += dist_sq
+            keys_used += 1
 
-    # Handle case where no valid keys were found (shouldn't happen ideally)
-    if valid_keys_count == 0:
-        return np.inf # Return infinity if no comparison possible
+    if keys_used == 0:
+        return np.inf
 
-    return np.sqrt(total_distance) # Return sqrt for Euclidean distance
+    # Return Euclidean distance
+    return np.sqrt(total_distance_sq)
+
+
+def run_abc_for_wn(true_wn, observed_summaries, fixed_params, task_params, seed):
+    """Sets up and runs pyabc.ABCSMC for a single true_wn."""
+
+    print(f"  Setting up ABC for true_wn = {true_wn:.3f}...")
+
+    # Define prior for w_n
+    # Prior should be reasonably wide but centered based on expectation
+    prior = Distribution(w_n=RV("uniform", 0, 2.0)) # Or RV("norm", 1.0, 0.5) etc.
+
+    # Create simulator function with fixed arguments bound
+    simulator_for_abc = partial(simulate_trials_and_summarize, # Use combined function
+                                fixed_params=fixed_params,
+                                salience_inputs=task_params['salience_inputs'],
+                                norm_inputs=task_params['norm_inputs'])
+
+    # Setup ABCSMC
+    abc = ABCSMC(
+        models=simulator_for_abc,
+        parameter_priors=prior,
+        distance_function=weighted_distance,
+        population_size=ABC_POPULATION_SIZE,
+        sampler=pyabc.sampler.MulticoreEvalParallelSampler(n_procs=os.cpu_count()) # Use multiple cores
+    )
+
+    # Define database path (unique per run or clear existing)
+    temp_dir = tempfile.gettempdir()
+    db_file = f"abc_nes_wn_{true_wn:.2f}_seed_{seed}.db"
+    db_path = f"sqlite:///{os.path.join(temp_dir, db_file)}"
+    if os.path.exists(db_path.replace("sqlite:///", "")):
+         os.remove(db_path.replace("sqlite:///", ""))
+
+    # Run ABC
+    print(f"  Starting ABC run (DB: {db_path})...")
+    abc.new(db_path, observed_summaries)
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+    print("  ABC run finished.")
+
+    return history
+
+def simulate_trials_and_summarize(params_abc, fixed_params, salience_inputs, norm_inputs):
+    """Helper function combining simulation and summary calculation for ABC."""
+    # Combine parameters correctly
+    full_params = {
+        'w_n': params_abc['w_n'], # Parameter sampled by ABC
+        'a': fixed_params['a'],
+        'w_s': fixed_params['w_s'],
+        **BASE_SIM_PARAMS
+        }
+    df_simulated = simulate_trials(full_params, salience_inputs, norm_inputs)
+    return calculate_summary_stats(df_simulated)
+
+def calculate_sbc_rank(posterior_samples, true_value):
+    """Calculates the rank of the true value within the posterior samples for SBC."""
+    # Ensure posterior_samples is a numpy array
+    samples = np.asarray(posterior_samples)
+    rank = np.sum(samples < true_value)
+    # Normalize rank for histogram (optional, raw rank is often used)
+    # normalized_rank = (rank + 1) / (len(samples) + 1)
+    return rank # Return raw rank for histogramming
+
+def plot_recovery(results_list):
+    """Plots true vs. recovered parameter values."""
+    if not results_list:
+        print("No results to plot for recovery.")
+        return
+
+    true_vals = [r['true_wn'] for r in results_list]
+    recovered_means = [r['recovered_mean'] for r in results_list]
+    recovered_stds = [r['recovered_std'] for r in results_list]
+
+    plt.figure(figsize=(8, 8))
+    plt.errorbar(true_vals, recovered_means, yerr=recovered_stds, fmt='o',
+                 label='Recovered Mean ± 1SD', capsize=5, alpha=0.7, color='blue')
+
+    min_val = min(true_vals) - 0.2
+    max_val = max(true_vals) + 0.2
+    plt.plot([min_val, max_val], [min_val, max_val], 'r--', label='Identity Line')
+
+    plt.xlabel("True w_n Value", fontsize=12)
+    plt.ylabel("Recovered w_n Value (Posterior Mean)", fontsize=12)
+    plt.title(f"Parameter Recovery Validation for w_n\n(a={TRUE_A}, w_s={TRUE_W_S} fixed, N={N_TRIALS_PER_WN} trials)", fontsize=14)
+    plt.legend(fontsize=10)
+    plt.grid(True, alpha=0.3)
+    plt.xlim(min_val, max_val)
+    plt.ylim(min_val, max_val)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.tight_layout()
+    plt.show()
+
+def plot_sbc_ranks(results_list, n_posterior_samples):
+    """Plots the histogram of SBC ranks."""
+    if not results_list:
+        print("No results to plot for SBC.")
+        return
+
+    ranks = [r['sbc_rank'] for r in recovery_results if 'sbc_rank' in r and not np.isnan(r['sbc_rank'])]
+    if not ranks:
+        print("No valid SBC ranks found to plot.")
+        return
+
+    plt.figure(figsize=(8, 6))
+    # Expected number of bins is often sqrt(n_simulations) or related to posterior sample size
+    # For visualization, let's use a reasonable number like 20 or 30
+    n_bins = min(30, max(10, int(np.sqrt(len(ranks)))))
+    plt.hist(ranks, bins=n_bins, density=True, alpha=0.7, color='green', edgecolor='black')
+
+    # Add uniform line for comparison
+    # Expected density is 1 / n_posterior_samples if rank is 0 to n_samples-1
+    # If rank is 0 to n_samples, expected density is 1 / (n_posterior_samples + 1) - let's use simple rank 0..N-1
+    expected_density = 1.0 / n_posterior_samples
+    # Need to know the range of ranks (0 to n_samples-1)
+    plt.axhline(expected_density, color='red', linestyle='--', label='Uniform (Expected)')
+
+    plt.xlabel("Rank of True Value in Posterior Samples", fontsize=12)
+    plt.ylabel("Density", fontsize=12)
+    plt.title(f"Simulation-Based Calibration (SBC) Ranks for w_n (N_posterior={n_posterior_samples})", fontsize=14)
+    plt.legend(fontsize=10)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
 
 # --- Main Execution Block ---
 if __name__ == '__main__':
 
-    print("Starting W_n Recovery Validation...")
+    print("="*60)
+    print("Starting W_n Recovery Validation Script")
+    print(f"Global Seed: {GLOBAL_SEED}")
     print(f"Fixed Parameters: a={TRUE_A}, w_s={TRUE_W_S}")
+    print(f"Base Sim Params: {BASE_SIM_PARAMS}")
     print(f"Testing w_n grid: {WN_GRID}")
     print(f"Trials per w_n value: {N_TRIALS_PER_WN}")
+    print(f"Task: {P_HIGH_CONFLICT*100}% High-Conflict Trials")
+    print(f"ABC Settings: Pop Size={ABC_POPULATION_SIZE}, Max Pops={ABC_MAX_NR_POPULATIONS}, Min Eps={ABC_MIN_EPSILON}")
+    print("="*60)
 
     # Store results
     recovery_results = []
 
+    # Generate the fixed trial inputs ONCE
+    print("Generating fixed trial inputs...")
+    salience_inputs, norm_inputs, trial_types = generate_trial_inputs(N_TRIALS_PER_WN, P_HIGH_CONFLICT)
+    task_params = {
+        'salience_inputs': salience_inputs,
+        'norm_inputs': norm_inputs
+        # Could add trial_types if needed for analysis later
+    }
+    print(f"Generated {len(salience_inputs)} trials inputs.")
+
     # --- Loop through each true w_n value ---
-    for true_wn in WN_GRID:
-        print("-" * 50)
-        print(f"Processing True w_n = {true_wn:.3f}")
+    for i, true_wn in enumerate(WN_GRID):
+        print("\n" + "-" * 50)
+        print(f"Processing Run {i+1}/{len(WN_GRID)}: True w_n = {true_wn:.3f}")
+        run_seed = GLOBAL_SEED + i # Vary seed slightly per run for ABC robustness
         start_time_wn = time.time()
 
         # 1. GENERATE SYNTHETIC "OBSERVED" DATA for this true_wn
-        np.random.seed(int(true_wn * 100)) # Seed based on w_n for consistency if re-run
-        salience_inputs = np.zeros(N_TRIALS_PER_WN)
-        norm_inputs = np.zeros(N_TRIALS_PER_WN)
-        trial_types = []
-
-        # Create structured Neutral vs High-Conflict trials
-        for i in range(N_TRIALS_PER_WN):
-            if np.random.rand() < P_HIGH_CONFLICT:
-                # High-Conflict Trial (like NoGo: S=1, N=1)
-                salience_inputs[i] = 1.0
-                norm_inputs[i] = 1.0
-                trial_types.append("Conflict")
-            else:
-                # Neutral Trial (like Go: S=1, N=0)
-                salience_inputs[i] = 1.0
-                norm_inputs[i] = 0.0
-                trial_types.append("Neutral")
-
-        observed_data = []
-        agent_obs = MVNESAgent(config={}) # Agent for generating observed data
+        print("  Generating observed data...")
         current_true_params = {
             'w_n': true_wn,
             'a': TRUE_A,
             'w_s': TRUE_W_S,
             **BASE_SIM_PARAMS
         }
-        print(f"Generating observed data with params: {current_true_params}")
-
-        for t in range(N_TRIALS_PER_WN):
-            # Parameters need to match expected keys in run_mvnes_trial
-            params_for_agent = {
-                'w_n': current_true_params['w_n'],
-                'threshold_a': current_true_params['a'], # Use 'a' key
-                'w_s': current_true_params['w_s'],
-                 **BASE_SIM_PARAMS # Pass other fixed params
-            }
-            trial_data = agent_obs.run_mvnes_trial(
-                salience_input=salience_inputs[t],
-                norm_input=norm_inputs[t],
-                params=params_for_agent
-            )
-            observed_data.append({
-                'subj': 0, # Single subject
-                'rt': trial_data['rt'],
-                'choice': trial_data['choice'],
-                'salience_input': salience_inputs[t],
-                'norm_input': norm_inputs[t],
-                'trial_type': trial_types[t]
-            })
-
-        df_obs = pd.DataFrame(observed_data)
-        print(f"Generated {len(df_obs)} trials.")
-        print(f"Observed Choice Rate: {df_obs['choice'].mean():.3f}")
+        df_obs = simulate_trials(current_true_params, salience_inputs, norm_inputs)
+        print(f"  Generated {len(df_obs)} trials. Observed Choice Rate: {df_obs['choice'].mean():.3f}")
 
         # 2. CALCULATE OBSERVED SUMMARY STATISTICS
-        # Need to pass fixed params dict to simulate_summary for internal use if needed,
-        # although for calculating stats on df_obs, it's not directly used.
-        # We simulate with placeholder params={} because stats are calculated on df_obs.
-        obs_summ = simulate_summary({}, current_true_params, salience_inputs, norm_inputs)
-        # Hack: Re-calculate directly from df_obs to avoid simulation variance
-        obs_summ = simulate_summary({'w_n': true_wn}, # Pass dummy param dict
-                                    {'a': TRUE_A, 'w_s': TRUE_W_S, **BASE_SIM_PARAMS}, # Pass fixed params
-                                    df_obs['salience_input'].values, # Pass actual inputs used
-                                    df_obs['norm_input'].values)     # Pass actual inputs used
+        print("  Calculating observed summary statistics...")
+        observed_summaries = calculate_summary_stats(df_obs)
+        if any(np.isnan(v) for v in observed_summaries.values()):
+             print("  WARNING: NaNs detected in observed summary statistics! Check simulation output.")
+             # Decide whether to skip ABC or proceed with NaN handling in distance
+             # continue # Option to skip if stats are bad
 
-        # Re-calculate observed summaries directly from the generated dataframe
-        # Create a temporary parameter dict just to pass structure
-        # This recalculation directly on df_obs avoids simulating again inside simulate_summary
-        # when we just want the stats of the data we *just* generated.
-        dummy_params_for_stat_calc = {'w_n': true_wn}
-        fixed_params_for_stat_calc = {'a': TRUE_A, 'w_s': TRUE_W_S, **BASE_SIM_PARAMS}
-        obs_summ = simulate_summary(dummy_params_for_stat_calc, fixed_params_for_stat_calc,
-                                    df_obs['salience_input'].values, df_obs['norm_input'].values)
-
-        print("\nCalculated Observed Summary Statistics:")
-        # Print a few key observed stats
-        print(f"  Obs Choice Rate: {obs_summ.get('choice_rate', 'N/A'):.3f}")
-        print(f"  Obs Choice=1 RT Mean: {obs_summ.get('choice_1_rt_mean', 'N/A'):.3f}")
-        print(f"  Obs Choice=0 RT Mean: {obs_summ.get('choice_0_rt_mean', 'N/A'):.3f}")
-        # Check for NaNs which indicate potential issues
-        if any(np.isnan(v) for v in obs_summ.values()):
-             print("WARNING: NaNs detected in observed summary statistics!")
-
-
-        # 3. SETUP AND RUN ABC-SMC
-        print("\nRunning ABC-SMC parameter recovery for w_n...")
-
-        # Define prior for w_n (centered loosely around expected range)
-        prior = Distribution(w_n=RV("uniform", 0, 2.0)) # Wider uniform prior
-
-        # Create simulator function correctly binding fixed arguments using partial
-        # The simulator needs the fixed parameters (a, w_s, etc.) AND the fixed inputs
+        # 3. RUN ABC-SMC
         fixed_params_for_abc = {'a': TRUE_A, 'w_s': TRUE_W_S, **BASE_SIM_PARAMS}
-        simulator_for_abc = partial(simulate_summary,
-                                    fixed_params=fixed_params_for_abc,
-                                    salience_inputs=salience_inputs,
-                                    norm_inputs=norm_inputs)
-
-        # Setup ABCSMC
-        abc = ABCSMC(
-            models=simulator_for_abc,
-            parameter_priors=prior,
-            distance_function=weighted_distance, # Use the custom distance function
-            population_size=ABC_POPULATION_SIZE
-        )
-
-        # Define database path
-        temp_dir = tempfile.gettempdir()
-        db_path = f"sqlite:///{os.path.join(temp_dir, f'abc_nes_wn_{true_wn:.2f}.db')}"
-        # Ensure a clean run if re-running for the same w_n
-        if os.path.exists(db_path.replace("sqlite:///", "")):
-             os.remove(db_path.replace("sqlite:///", ""))
-
-        # Run ABC
-        abc.new(db_path, obs_summ)
-        history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
-
-        print(f"\nABC run finished for w_n = {true_wn:.3f}.")
-        end_time_wn = time.time()
-        print(f"Time taken: {end_time_wn - start_time_wn:.1f} seconds.")
+        history = run_abc_for_wn(true_wn, observed_summaries, fixed_params_for_abc, task_params, seed=run_seed)
 
         # 4. EXTRACT AND STORE RESULTS
+        print("  Extracting results...")
+        run_result = {'true_wn': true_wn}
         try:
-            df_posterior, w = history.get_distribution(m=0)
+            # Get weighted posterior distribution from the last generation
+            df_posterior, w = history.get_distribution(m=0, t=history.max_t)
             if not df_posterior.empty:
-                # Calculate weighted mean and median
-                mean_w = np.sum(df_posterior['w_n'] * w)
-                # Weighted median requires sorting and cumulative sum
+                # Ensure weights sum to 1 for weighted stats
+                w_norm = w / np.sum(w)
+                # Calculate weighted mean
+                mean_w = np.sum(df_posterior['w_n'] * w_norm)
+                # Calculate weighted std dev
+                std_w = np.sqrt(np.sum(w_norm * (df_posterior['w_n'] - mean_w)**2))
+                # Calculate weighted median more robustly
                 sorted_indices = np.argsort(df_posterior['w_n'])
-                sorted_w_n = df_posterior['w_n'].iloc[sorted_indices]
-                sorted_w = w[sorted_indices]
-                cum_w = np.cumsum(sorted_w)
-                median_idx = np.where(cum_w >= 0.5)[0][0]
-                median_w = sorted_w_n.iloc[median_idx]
+                cum_w = np.cumsum(w_norm[sorted_indices])
+                median_idx = np.searchsorted(cum_w, 0.5)
+                median_w = df_posterior['w_n'].iloc[sorted_indices[median_idx]]
 
-                # Calculate weighted HDI (using arviz helper if possible, or approx)
-                # For simplicity, using pandas describe on weighted samples (approx)
-                # A better way uses arviz: az.hdi(df_posterior['w_n'].values, hdi_prob=0.94, weights=w)
-                # Let's store basic stats for now
-                std_w = np.sqrt(np.sum(w * (df_posterior['w_n'] - mean_w)**2))
+                # Calculate SBC Rank
+                # Using unweighted samples for simplicity, acknowledge limitation
+                sbc_rank = calculate_sbc_rank(df_posterior['w_n'].values, true_wn)
 
-                recovery_results.append({
-                    'true_wn': true_wn,
+                run_result.update({
                     'recovered_mean': mean_w,
                     'recovered_median': median_w,
                     'recovered_std': std_w,
-                    'posterior_df': df_posterior # Store samples for detailed plotting later
+                    'sbc_rank': sbc_rank,
+                    'n_posterior_samples': len(df_posterior)
+                    # Avoid storing large posterior_df for multiple runs unless needed
                 })
-                print(f"  Recovered Mean: {mean_w:.3f}, Median: {median_w:.3f}, Std: {std_w:.3f}")
+                print(f"  Recovered Mean: {mean_w:.3f}, Median: {median_w:.3f}, Std: {std_w:.3f}, SBC Rank: {sbc_rank}")
             else:
                 print("  ERROR: Posterior distribution is empty!")
-                recovery_results.append({
-                    'true_wn': true_wn, 'recovered_mean': np.nan,
-                    'recovered_median': np.nan, 'recovered_std': np.nan,
-                    'posterior_df': pd.DataFrame()
-                })
+                run_result.update({'recovered_mean': np.nan, 'recovered_median': np.nan,
+                                   'recovered_std': np.nan, 'sbc_rank': np.nan,
+                                   'n_posterior_samples': 0})
         except Exception as e:
-             print(f"  ERROR extracting results for w_n = {true_wn:.3f}: {e}")
-             recovery_results.append({
-                    'true_wn': true_wn, 'recovered_mean': np.nan,
-                    'recovered_median': np.nan, 'recovered_std': np.nan,
-                    'posterior_df': pd.DataFrame()
-                })
+             print(f"  ERROR extracting results: {e}")
+             run_result.update({'recovered_mean': np.nan, 'recovered_median': np.nan,
+                                'recovered_std': np.nan, 'sbc_rank': np.nan,
+                                'n_posterior_samples': 0})
+
+        recovery_results.append(run_result)
+        end_time_wn = time.time()
+        print(f"  Finished processing w_n={true_wn:.3f} in {end_time_wn - start_time_wn:.1f} sec.")
 
 
-    # --- 5. FINAL PLOTTING ---
-    print("-" * 50)
-    print("Generating final recovery plot...")
+    # --- 5. FINAL ANALYSIS & PLOTTING ---
+    print("\n" + "="*60)
+    print("Finished all runs. Generating final plots...")
 
-    true_vals = [r['true_wn'] for r in recovery_results]
-    recovered_means = [r['recovered_mean'] for r in recovery_results]
-    recovered_medians = [r['recovered_median'] for r in recovery_results]
-    recovered_stds = [r['recovered_std'] for r in recovery_results]
+    if recovery_results:
+        # Convert results to DataFrame for easier handling if needed
+        results_df = pd.DataFrame(recovery_results)
+        print("\nRecovery Summary:")
+        print(results_df[['true_wn', 'recovered_mean', 'recovered_median', 'recovered_std']].round(3))
 
-    plt.figure(figsize=(8, 8))
-    plt.errorbar(true_vals, recovered_means, yerr=recovered_stds, fmt='o',
-                 label='Recovered Mean ± 1SD', capsize=5, alpha=0.7)
-    # plt.scatter(true_vals, recovered_medians, color='green', marker='x', label='Recovered Median')
-    
-    # Add identity line
-    min_val = min(WN_GRID) - 0.1
-    max_val = max(WN_GRID) + 0.1
-    plt.plot([min_val, max_val], [min_val, max_val], 'r--', label='Identity Line (Perfect Recovery)')
-
-    plt.xlabel("True w_n Value", fontsize=12)
-    plt.ylabel("Recovered w_n Value (Posterior Mean)", fontsize=12)
-    plt.title("Parameter Recovery Validation for w_n (a, w_s fixed)", fontsize=14)
-    plt.legend(fontsize=10)
-    plt.grid(True, alpha=0.3)
-    plt.xlim(min_val, max_val)
-    plt.ylim(min_val, max_val)
-    plt.gca().set_aspect('equal', adjustable='box') # Ensure equal scaling
-    plt.tight_layout()
-    plt.show()
+        # Generate Plots
+        plot_recovery(recovery_results)
+        # Get sample size from first valid run for SBC plot title
+        n_samples_for_sbc_plot = next((r['n_posterior_samples'] for r in recovery_results if r['n_posterior_samples'] > 0), ABC_POPULATION_SIZE)
+        plot_sbc_ranks(recovery_results, n_samples_for_sbc_plot)
+    else:
+        print("No valid recovery results were obtained.")
 
     print("\nValidation script finished.")
+    print("="*60)
