@@ -1,0 +1,849 @@
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 89 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 90/100
+  Step 1: Drawn True w_n = 0.3827
+  Step 2: Generating 'observed' data (N=300)...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    Obs Choice Rate: 0.470  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main
+
+  Step 3: Running ABC-SMC (Seed: 132)...
+new_handle = reduction.duplicate(pipe_handle,
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:06>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.073763, end_time=2025-05-06 08:27:06>
+    ERROR during ABC run or result extraction for true_wn=0.3827:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 90 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 91/100
+  Step 1: Drawn True w_n = 1.7786
+  Step 2: Generating 'observed' data (N=300)...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+    Obs Choice Rate: 0.443
+  Step 3: Running ABC-SMC (Seed: 133)...
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:06>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.069350, end_time=2025-05-06 08:27:06>
+    ERROR during ABC run or result extraction for true_wn=1.7786:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 91 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 92/100
+  Step 1: Drawn True w_n = 1.7003
+  Step 2: Generating 'observed' data (N=300)...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^    Obs Choice Rate: 0.463^
+^^^  Step 3: Running ABC-SMC (Seed: 134)...^
+^^^^ABC.Sampler INFO: Parallelize sampling on 12 processes.
+^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:06>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.071878, end_time=2025-05-06 08:27:06>
+    ERROR during ABC run or result extraction for true_wn=1.7003:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 92 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 93/100
+  Step 1: Drawn True w_n = 0.1881
+  Step 2: Generating 'observed' data (N=300)...
+    Obs Choice Rate: 0.697
+  Step 3: Running ABC-SMC (Seed: 135)...
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:06>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.074675, end_time=2025-05-06 08:27:06>
+    ERROR during ABC run or result extraction for true_wn=0.1881:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 93 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 94/100
+  Step 1: Drawn True w_n = 0.5342
+  Step 2: Generating 'observed' data (N=300)...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+    Obs Choice Rate: 0.437
+  Step 3: Running ABC-SMC (Seed: 136)...
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:07>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.072686, end_time=2025-05-06 08:27:07>     
+    ERROR during ABC run or result extraction for true_wn=0.5342:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 94 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 95/100
+  Step 1: Drawn True w_n = 0.5003
+  Step 2: Generating 'observed' data (N=300)...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    Obs Choice Rate: 0.440  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate
+
+  Step 3: Running ABC-SMC (Seed: 137)...
+    return _winapi.DuplicateHandle(
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:07>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.099738, end_time=2025-05-06 08:27:07>
+    ERROR during ABC run or result extraction for true_wn=0.5003:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 95 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 96/100
+  Step 1: Drawn True w_n = 1.2966
+  Step 2: Generating 'observed' data (N=300)...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    Obs Choice Rate: 0.437    return _winapi.DuplicateHandle(
+
+   Step 3: Running ABC-SMC (Seed: 138)...
+  ABC.Sampler INFO: Parallelize sampling on 12 processes.
+      ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:07>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.074547, end_time=2025-05-06 08:27:07>
+    ERROR during ABC run or result extraction for true_wn=1.2966:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 96 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 97/100
+  Step 1: Drawn True w_n = 0.8583
+  Step 2: Generating 'observed' data (N=300)...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+    Obs Choice Rate: 0.430
+  Step 3: Running ABC-SMC (Seed: 139)...
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:07>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.068809, end_time=2025-05-06 08:27:07>
+    ERROR during ABC run or result extraction for true_wn=0.8583:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 97 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 98/100
+  Step 1: Drawn True w_n = 1.0520
+  Step 2: Generating 'observed' data (N=300)...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+    Obs Choice Rate: 0.430
+  Step 3: Running ABC-SMC (Seed: 140)...
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:07>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.071774, end_time=2025-05-06 08:27:07>
+    ERROR during ABC run or result extraction for true_wn=1.0520:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 98 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 99/100
+  Step 1: Drawn True w_n = 0.7709
+  Step 2: Generating 'observed' data (N=300)...
+    Obs Choice Rate: 0.423
+  Step 3: Running ABC-SMC (Seed: 141)...
+Traceback (most recent call last):
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:08>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.074080, end_time=2025-05-06 08:27:08>
+    ERROR during ABC run or result extraction for true_wn=0.7709:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 99 in 0.2 sec.
+
+--------------------------------------------------
+Running SBC Simulation 100/100
+  Step 1: Drawn True w_n = 1.8850
+  Step 2: Generating 'observed' data (N=300)...
+    Obs Choice Rate: 0.427
+  Step 3: Running ABC-SMC (Seed: 142)...
+ABC.Sampler INFO: Parallelize sampling on 12 processes.
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
+ABC.History INFO: Start <ABCSMC id=1, start_time=2025-05-06 08:27:08>
+ABC INFO: Calibration sample t = -1.
+ABC.History INFO: Done <ABCSMC id=1, duration=0:00:00.075962, end_time=2025-05-06 08:27:08>
+    ERROR during ABC run or result extraction for true_wn=1.8850:
+Traceback (most recent call last):
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\run_sbc_for_wn.py", line 498, in <module>
+    history = abc.run(minimum_epsilon=ABC_MIN_EPSILON, max_nr_populations=ABC_MAX_NR_POPULATIONS)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 62, in wrapped_run
+    ret = run(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 687, in run
+    t0: int = self.initialize_components_before_run(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 768, in initialize_components_before_run
+    self._initialize_dist_eps_acc(t0)
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 492, in _initialize_dist_eps_acc
+    self.eps.initialize(
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\epsilon\epsilon.py", line 152, in initialize
+    weighted_distances = get_weighted_distances()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 458, in get_initial_weighted_distances
+    population = _get_initial_population_with_distances()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 449, in _get_initial_population_with_distances
+    population = self._get_initial_population(t - 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 525, in _get_initial_population
+    population = self._sample_from_prior(t)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\inference\smc.py", line 553, in _sample_from_prior
+    sample = self.sampler.sample_until_n_accepted(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\base.py", line 20, in sample_until_n_accepted
+    sample = f(self, n, simulate_one, t, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jesse\Hegemonikon Project\hegemonikon\.venv\Lib\site-packages\pyabc\sampler\multicore_evaluation_parallel.py", line 132, in sample_until_n_accepted
+    proc.start()
+  File "C:\Program Files\Python312\Lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\context.py", line 337, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\popen_spawn_win32.py", line 95, in __init__
+    reduction.dump(process_obj, to_child)
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't get local object 'create_simulate_from_prior_function.<locals>.simulate_one'
+  Finished SBC Iteration 100 in 0.2 sec.
+
+============================================================
+Finished all SBC simulations. Generating final plot...
+
+SBC Results Summary (First 5 & Last 5 Rows):
+     true_wn  sbc_rank  n_posterior_samples
+0   0.749080       NaN                    0
+1   0.944639       NaN                    0
+2   0.291253       NaN                    0
+3   1.954816       NaN                    0
+4   0.781230       NaN                    0
+95  1.296564       NaN                    0
+96  0.858288       NaN                    0
+97  1.051956       NaN                    0
+98  0.770928       NaN                    0
+99  1.884952       NaN                    0
+
+Number of valid ranks obtained: 0 / 100
+No valid ranks to plot.
+
+SBC validation script finished.
+============================================================
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Program Files\Python312\Lib\multiprocessing\spawn.py", line 113, in spawn_main       
+    new_handle = reduction.duplicate(pipe_handle,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\multiprocessing\reduction.py", line 79, in duplicate     
+    return _winapi.DuplicateHandle(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 6] The handle is invalid
