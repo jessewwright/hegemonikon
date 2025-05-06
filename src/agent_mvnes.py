@@ -7,13 +7,42 @@ import pandas as pd
 import random
 
 class MVNESAgent:
-    def __init__(self, config):
+    def __init__(self, config=None):
         """
         Initialize the MVNES agent.
         
         Args:
-            config: Configuration parameters for the agent
+            config: Optional configuration parameters for the agent
         """
+        # Use agent_config if no config is provided
+        if config is None:
+            try:
+                from src.agent_config import (THRESHOLD_A, W_S, W_N, T_NONDECISION,
+                                         NOISE_STD_DEV, DT, MAX_TIME,
+                                         AFFECT_STRESS_THRESHOLD_REDUCTION)
+                config = {
+                    'w_s': W_S,
+                    'w_n': W_N,
+                    'threshold_a': THRESHOLD_A,
+                    't': T_NONDECISION,
+                    'noise_std_dev': NOISE_STD_DEV,
+                    'dt': DT,
+                    'max_time': MAX_TIME,
+                    'affect_stress_threshold_reduction': AFFECT_STRESS_THRESHOLD_REDUCTION
+                }
+            except ImportError:
+                print("Warning: Could not import from agent_config. Using default parameters.")
+                config = {
+                    'w_s': 1.0,
+                    'w_n': 1.0,
+                    'threshold_a': 1.0,
+                    't': 0.1,
+                    'noise_std_dev': 1.0,
+                    'dt': 0.01,
+                    'max_time': 2.0,
+                    'affect_stress_threshold_reduction': -0.3
+                }
+        
         self.config = config
         self.beliefs = {}
         self.trial_count = 0
@@ -56,11 +85,21 @@ class MVNESAgent:
         sigma = params['noise_std_dev']
         dt = params['dt']
         max_time = params['max_time']
+        veto_flag = params.get('veto_flag', False)
+
+        # Check for veto condition before accumulation
+        if veto_flag and norm_input > 0:  # NoGo trial
+            return {
+                'choice': 0,  # Inhibit/CorrectReject
+                'rt': t + dt,  # Non-decision time plus small delay
+                'trace': [0.0],  # No accumulation occurred
+                'timeout': False
+            }
 
         # Calculate effective drift rate: v = w_s*S + w_n*N_eff
         # For Go/No-Go:
         # Go trial: S=+1 (e.g.), N=0  => v = w_s
-        # NoGo trial: S can be 0 or slightly positive (go impulse), N=+1 (inhibit signal)
+        # NoGo trial: S can be 0 or slightly positive (go impulse), N=1 (inhibit signal)
         # Let's assume N represents the *inhibitory* push against Go.
         # So, on NoGo, the norm tries to *reduce* the effective drift.
         # A simple way: v = w_s * salience_input - w_n * norm_input
@@ -159,45 +198,73 @@ class MVNESAgent:
 if __name__ == "__main__":
     print("Testing MVNES Agent DDM Simulation...")
 
-    # Define some test parameters (replace with config values later)
-    test_params_go = {
-        'w_s': 0.6, 'w_n': 0.8, 'threshold_a': 0.5, 't': 0.1,
-        'noise_std_dev': 0.2, 'dt': 0.01, 'max_time': 2.0
-    }
-    test_params_nogo = {
-        'w_s': 0.6, 'w_n': 0.8, 'threshold_a': 0.5, 't': 0.1,
-        'noise_std_dev': 0.2, 'dt': 0.01, 'max_time': 2.0
-    }
-    # Note: In NoGo, w_n > w_s, so drift should be negative
+    try:
+        from src.agent_config import (THRESHOLD_A, W_S, W_N, T_NONDECISION,
+                                     NOISE_STD_DEV, DT, MAX_TIME,
+                                     AFFECT_STRESS_THRESHOLD_REDUCTION, VETO_FLAG)
+        print("Using parameters from agent_config.py")
+    except ImportError:
+        print("Warning: Could not import from agent_config. Using default parameters.")
+        THRESHOLD_A = 0.5
+        W_S = 0.6
+        W_N = 0.8
+        T_NONDECISION = 0.1
+        NOISE_STD_DEV = 0.2
+        DT = 0.01
+        MAX_TIME = 2.0
+        AFFECT_STRESS_THRESHOLD_REDUCTION = -0.3
+        VETO_FLAG = False
 
-    print("\nSimulating Go Trial:")
+    # Create test parameters using config values
+    test_params = {
+        'w_s': W_S,
+        'w_n': W_N,
+        'threshold_a': THRESHOLD_A,
+        't': T_NONDECISION,
+        'noise_std_dev': NOISE_STD_DEV,
+        'dt': DT,
+        'max_time': MAX_TIME,
+        'affect_stress_threshold_reduction': AFFECT_STRESS_THRESHOLD_REDUCTION,
+        'veto_flag': VETO_FLAG
+    }
+
+    print("\nTest 1: Basic Go Trial (No Veto)")
     go_results = []
     for _ in range(10):
         # Go trial: High salience (S=1), No norm input (N=0)
-        agent = MVNESAgent({'learning_rate': 0.1, 'block_size': 10, 'temperature': 1.0})
-        result = agent.run_mvnes_trial(salience_input=1.0, norm_input=0.0, params=test_params_go)
+        agent = MVNESAgent()
+        result = agent.run_mvnes_trial(salience_input=1.0, norm_input=0.0, params=test_params)
         go_results.append(result)
-    print(pd.DataFrame(go_results).round(3))
-    print(f"Go Rate: {(pd.DataFrame(go_results)['choice'] == 1).mean():.2f}")
+    df = pd.DataFrame(go_results).round(3)
+    print("\nGo Trial Results:")
+    print(df)
+    print(f"Go Rate: {(df['choice'] == 1).mean():.2f}")
 
-
-    print("\nSimulating NoGo Trial:")
+    print("\nTest 2: NoGo Trial (No Veto)")
     nogo_results = []
     for _ in range(10):
-         # NoGo trial: Assume some Go salience (S=1?), Strong norm input (N=1)
-        agent = MVNESAgent({'learning_rate': 0.1, 'block_size': 10, 'temperature': 1.0})
-        result = agent.run_mvnes_trial(salience_input=1.0, norm_input=1.0, params=test_params_nogo)
+        # NoGo trial: Strong norm input (N=1)
+        agent = MVNESAgent()
+        result = agent.run_mvnes_trial(salience_input=1.0, norm_input=1.0, params=test_params)
         nogo_results.append(result)
-    print(pd.DataFrame(nogo_results).round(3))
-    print(f"False Alarm Rate (Go on NoGo): {(pd.DataFrame(nogo_results)['choice'] == 1).mean():.2f}")
+    df = pd.DataFrame(nogo_results).round(3)
+    print("\nNoGo Trial Results:")
+    print(df)
+    print(f"False Alarm Rate: {(df['choice'] == 1).mean():.2f}")
 
-    print("\nSimulating NoGo Trial (Weaker Inhibition w_n < w_s):")
-    test_params_nogo_weak = test_params_nogo.copy()
-    test_params_nogo_weak['w_n'] = 0.4 # Now w_n < w_s
-    nogo_weak_results = []
+    print("\nTest 3: NoGo Trial with Veto")
+    # Enable veto flag and test again
+    test_params_veto = test_params.copy()
+    test_params_veto['veto_flag'] = True
+    nogo_veto_results = []
     for _ in range(10):
-        agent = MVNESAgent({'learning_rate': 0.1, 'block_size': 10, 'temperature': 1.0})
-        result = agent.run_mvnes_trial(salience_input=1.0, norm_input=1.0, params=test_params_nogo_weak)
-        nogo_weak_results.append(result)
-    print(pd.DataFrame(nogo_weak_results).round(3))
-    print(f"False Alarm Rate (Weak Inhibition): {(pd.DataFrame(nogo_weak_results)['choice'] == 1).mean():.2f}")
+        # NoGo trial with veto enabled
+        agent = MVNESAgent()
+        result = agent.run_mvnes_trial(salience_input=1.0, norm_input=1.0, params=test_params_veto)
+        nogo_veto_results.append(result)
+    df = pd.DataFrame(nogo_veto_results).round(3)
+    print("\nNoGo Trial Results with Veto:")
+    print(df)
+    print(f"False Alarm Rate: {(df['choice'] == 1).mean():.2f}")
+    print(f"Average RT: {df['rt'].mean():.3f}")
+    print("Note: With veto enabled, RT should be close to non-decision time + dt")

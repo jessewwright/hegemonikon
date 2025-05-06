@@ -16,10 +16,12 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 # Try to import config and agent, fall back to default parameters if not available
 try:
-    from src.config import *
+    from src.agent_config import *
+    from src.task_config import *
 except ImportError:
-    print("Warning: Could not import from config. Using default parameters.")
+    print("Warning: Could not import from config files. Using default parameters.")
     # Default parameters
+    # Agent parameters
     W_S = 1.0
     W_N = 1.0
     THRESHOLD_A = 1.0
@@ -27,9 +29,10 @@ except ImportError:
     NOISE_STD_DEV = 1.0
     DT = 0.01
     MAX_TIME = 2.0
+    AFFECT_STRESS_THRESHOLD_REDUCTION = -0.3
+    # Task parameters
     N_TRIALS = 200
     P_GO_TRIAL = 0.5
-    AFFECT_STRESS_THRESHOLD_REDUCTION = -0.3
 
 try:
     from src.agent_mvnes import MVNESAgent
@@ -182,9 +185,19 @@ def run_simulation(n_trials=N_TRIALS, p_go=P_GO_TRIAL, custom_params=None):
     param_str = f"wn_{sim_params['w_n']}_ws_{sim_params['w_s']}"
     results_dir = Path(__file__).parent.parent / 'data'
     results_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Save parameters as JSON
+    params_file = results_dir / f'mvnes_gng_params_{param_str}.json'
+    with open(params_file, 'w') as f:
+        import json
+        json.dump(sim_params, f, indent=4)
+    print(f"\nParameters saved to {params_file}")
+    
+    # Save trial results without parameters
+    trial_results_df = results_df.drop(columns=[k for k in sim_params.keys() if k in results_df.columns])
     results_file = results_dir / f'mvnes_gng_results_{param_str}.csv'
-    results_df.to_csv(results_file, index=False, float_format='%.4f')
-    print(f"\nResults saved to {results_file}")
+    trial_results_df.to_csv(results_file, index=False, float_format='%.4f')
+    print(f"Trial results saved to {results_file}")
     
     return results_df
 
@@ -232,6 +245,38 @@ def run_simulation(n_trials=N_TRIALS, p_go=P_GO_TRIAL, custom_params=None):
     print(f"Simulation finished in {end_time - start_time:.2f} seconds.")
 
     return pd.DataFrame(results)
+
+def load_simulation_results(results_file, params_file=None):
+    """
+    Load simulation results and parameters from files.
+    
+    Args:
+        results_file: Path to the CSV file containing trial results
+        params_file: Optional path to the JSON file containing parameters.
+                     If None, will attempt to infer from results_file name.
+        
+    Returns:
+        tuple: (pd.DataFrame of trial results, dict of parameters)
+    """
+    # Load trial results
+    trial_results_df = pd.read_csv(results_file)
+    
+    # Load parameters
+    if params_file is None:
+        # If no params_file provided, attempt to infer from results_file
+        import re
+        match = re.search(r'wn_(\d+\.\d+)_ws_(\d+\.\d+)', str(results_file))
+        if not match:
+            raise ValueError(f"Could not extract parameters from filename: {results_file}")
+        
+        param_str = f"wn_{match.group(1)}_ws_{match.group(2)}"
+        params_file = results_file.parent / f'mvnes_gng_params_{param_str}.json'
+    
+    with open(params_file, 'r') as f:
+        import json
+        params = json.load(f)
+    
+    return trial_results_df, params
 
 # --- Example Execution ---
 if __name__ == "__main__":
