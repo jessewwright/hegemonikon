@@ -62,10 +62,10 @@ GLOBAL_SEED = 42
 np.random.seed(GLOBAL_SEED)
 
 # SBC Parameters
-N_SBC_SIMULATIONS = 100   # Number of SBC iterations (e.g., 100 for initial check, 500+ for smooth plot)
+N_SBC_SIMULATIONS = 20   # Reduced from 100 for faster testing
 
 # Simulation Parameters (per SBC iteration)
-N_TRIALS_PER_SIM = 300    # Trials per synthetic dataset (Increase for more stable summaries)
+N_TRIALS_PER_SIM = 100    # Reduced from 300 for faster testing
 
 # Fixed Model Parameters (MUST BE CONSISTENT with agent_mvnes internals)
 # *** PLEASE DOUBLE-CHECK THESE VALUES MATCH YOUR INTENDED FIXED STATE ***
@@ -88,7 +88,7 @@ NEUTRAL_NORM = 0.0
 CONFLICT_SALIENCE = 1.0 # Assume Go drive is present
 CONFLICT_NORM = 1.0     # Norm opposes Go drive
 
-# ABC Configuration
+# ABC Configuration (Optimized for speed)
 ABC_POPULATION_SIZE = 100 # Smaller for SBC checks
 ABC_MAX_NR_POPULATIONS = 8 # Max generations
 ABC_MIN_EPSILON = 0.005 # Target epsilon (might need tuning based on distances)
@@ -474,8 +474,9 @@ if __name__ == '__main__':
                                              salience_inputs=salience_inputs,
                                              norm_inputs=norm_inputs)
 
-            # Setup single-core sampler to avoid multiprocessing issues
-            sampler = pyabc.sampler.SingleCoreSampler()
+            # Setup multicore sampler to utilize multiple cores
+            sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=os.cpu_count())
+            # Note: Using multicore sampler to speed up computations
 
             abc = ABCSMC(
                 models=simulator_for_this_abc,

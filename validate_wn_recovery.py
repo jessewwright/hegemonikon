@@ -369,6 +369,10 @@ for i, true_wn in enumerate(WN_GRID):
 print("\n" + "="*60)
 print("Finished all runs. Generating final plots...")
 
+# Generate both plots
+plot_recovery(recovery_results)
+plot_sbc_ranks(recovery_results)
+
 # Function to plot recovery results
 
 def plot_sbc_ranks(recovery_results):
@@ -401,6 +405,7 @@ def plot_sbc_ranks(recovery_results):
         
         plt.tight_layout()
         plt.savefig('sbc_rank_distribution.png')
+        plt.show()
         plt.close()
 
 # Function to plot recovery results
@@ -438,6 +443,7 @@ def plot_recovery(recovery_results):
     
     plt.tight_layout()
     plt.savefig('wn_recovery_results.png')
+    plt.show()
     plt.close()
 
 if recovery_results:
