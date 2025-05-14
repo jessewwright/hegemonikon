@@ -1,9 +1,9 @@
 # PowerShell script to run multiple SBC instances in parallel
 
 # Number of parallel runs
-$parallelRuns = 3
+$parallelRuns = 4
 # Number of SBC iterations per run
-$simsPerRun = 1
+$simsPerRun = 25
 
 # Create a new window for each run
 $processes = @()

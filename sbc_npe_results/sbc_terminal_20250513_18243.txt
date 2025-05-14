@@ -1,0 +1,711 @@
+Using 10000 valid simulations for training NPE.
+ Neural network successfully converged after 98 epochs.NPE training took: 2986.56s
+
+--- Phase 2: Running 100 SBC iterations ---
+
+------------------------------
+SBC Iteration 1/100
+  True parameters for this iteration: ['0.656', '0.739', '0.253', '0.819']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1081it [00:00, 17251.45it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(60), np.int64(909), np.int64(563), np.int64(336)]
+
+------------------------------
+SBC Iteration 2/100
+  True parameters for this iteration: ['0.113', '0.641', '0.169', '0.876']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1132it [00:00, 14884.00it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(94), np.int64(813), np.int64(346), np.int64(692)]
+
+------------------------------
+SBC Iteration 3/100
+  True parameters for this iteration: ['0.964', '0.723', '0.198', '0.970']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1067it [00:00, 16877.95it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(698), np.int64(588), np.int64(234), np.int64(13)]
+
+------------------------------
+SBC Iteration 4/100
+  True parameters for this iteration: ['1.635', '1.126', '0.331', '0.342']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1110it [00:00, 15265.87it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(783), np.int64(326), np.int64(873), np.int64(248)]
+
+------------------------------
+SBC Iteration 5/100
+  True parameters for this iteration: ['1.027', '0.710', '0.164', '0.327']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1060it [00:00, 16312.17it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(382), np.int64(699), np.int64(146), np.int64(165)]
+
+------------------------------
+SBC Iteration 6/100
+  True parameters for this iteration: ['1.602', '0.454', '0.481', '0.803']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1069it [00:00, 12524.89it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(604), np.int64(14), np.int64(989), np.int64(321)]
+
+------------------------------
+SBC Iteration 7/100
+  True parameters for this iteration: ['0.405', '0.866', '0.398', '0.732']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1079it [00:00, 17697.42it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(830), np.int64(382), np.int64(754), np.int64(209)]
+
+------------------------------
+SBC Iteration 8/100
+  True parameters for this iteration: ['1.365', '0.879', '0.088', '0.549']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1057it [00:00, 15943.68it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(22), np.int64(969), np.int64(8), np.int64(932)]
+
+------------------------------
+SBC Iteration 9/100
+  True parameters for this iteration: ['1.478', '1.290', '0.139', '0.683']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1085it [00:00, 16111.83it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(221), np.int64(381), np.int64(509), np.int64(127)]
+
+------------------------------
+SBC Iteration 10/100
+  True parameters for this iteration: ['1.904', '0.742', '0.273', '0.697']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1242it [00:00, 15118.21it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(553), np.int64(478), np.int64(403), np.int64(912)]
+
+------------------------------
+SBC Iteration 11/100
+  True parameters for this iteration: ['1.074', '0.976', '0.380', '1.011']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1045it [00:00, 16454.67it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(970), np.int64(222), np.int64(810), np.int64(362)]
+
+------------------------------
+SBC Iteration 12/100
+  True parameters for this iteration: ['1.643', '0.682', '0.382', '0.396']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1051it [00:00, 16258.67it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(906), np.int64(446), np.int64(928), np.int64(220)]
+
+------------------------------
+SBC Iteration 13/100
+  True parameters for this iteration: ['0.557', '1.112', '0.349', '1.163']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1036it [00:00, 16363.08it/s]                     
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(819), np.int64(307), np.int64(652), np.int64(951)]
+
+------------------------------
+SBC Iteration 14/100
+  True parameters for this iteration: ['1.683', '0.757', '0.307', '1.135']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1036it [00:00, 16078.04it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(722), np.int64(565), np.int64(777), np.int64(869)]
+
+------------------------------
+SBC Iteration 15/100
+  True parameters for this iteration: ['1.231', '0.959', '0.314', '1.023']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1079it [00:00, 17330.51it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(713), np.int64(539), np.int64(620), np.int64(571)]
+
+------------------------------
+SBC Iteration 16/100
+  True parameters for this iteration: ['2.000', '0.583', '0.494', '0.584']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1075it [00:00, 15544.42it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(1000), np.int64(21), np.int64(989), np.int64(609)]
+
+------------------------------
+SBC Iteration 17/100
+  True parameters for this iteration: ['0.797', '0.916', '0.411', '0.546']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1093it [00:00, 15481.42it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(743), np.int64(548), np.int64(299), np.int64(234)]
+
+------------------------------
+SBC Iteration 18/100
+  True parameters for this iteration: ['0.854', '1.127', '0.285', '0.915']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1049it [00:00, 17094.80it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(725), np.int64(91), np.int64(633), np.int64(463)]
+
+------------------------------
+SBC Iteration 19/100
+  True parameters for this iteration: ['0.827', '0.711', '0.216', '0.476']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1092it [00:00, 15658.84it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(94), np.int64(831), np.int64(317), np.int64(116)]
+
+------------------------------
+SBC Iteration 20/100
+  True parameters for this iteration: ['0.283', '0.445', '0.430', '0.625']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1092it [00:00, 16802.94it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(717), np.int64(185), np.int64(922), np.int64(864)]
+
+------------------------------
+SBC Iteration 21/100
+  True parameters for this iteration: ['0.547', '0.766', '0.148', '1.143']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1032it [00:00, 15859.57it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(261), np.int64(413), np.int64(222), np.int64(862)]
+
+------------------------------
+SBC Iteration 22/100
+  True parameters for this iteration: ['1.345', '0.562', '0.345', '1.065']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1062it [00:00, 16843.13it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(174), np.int64(473), np.int64(264), np.int64(314)]
+
+------------------------------
+SBC Iteration 23/100
+  True parameters for this iteration: ['1.335', '0.913', '0.091', '0.543']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1053it [00:00, 15640.30it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(266), np.int64(907), np.int64(167), np.int64(700)]
+
+------------------------------
+SBC Iteration 24/100
+  True parameters for this iteration: ['1.057', '1.246', '0.495', '0.360']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1054it [00:00, 14877.32it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(419), np.int64(349), np.int64(987), np.int64(78)]
+
+------------------------------
+SBC Iteration 25/100
+  True parameters for this iteration: ['0.378', '1.324', '0.124', '0.468']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1038it [00:00, 17455.39it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(324), np.int64(768), np.int64(181), np.int64(319)]
+
+------------------------------
+SBC Iteration 26/100
+  True parameters for this iteration: ['0.476', '1.136', '0.336', '1.060']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1033it [00:00, 15371.55it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(44), np.int64(410), np.int64(488), np.int64(362)]
+
+------------------------------
+SBC Iteration 27/100
+  True parameters for this iteration: ['1.175', '1.165', '0.284', '0.979']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1039it [00:00, 14365.57it/s]                     
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(422), np.int64(527), np.int64(104), np.int64(282)]
+
+------------------------------
+SBC Iteration 28/100
+  True parameters for this iteration: ['0.431', '0.840', '0.137', '0.393']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1075it [00:00, 15262.44it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(590), np.int64(298), np.int64(572), np.int64(461)]
+
+------------------------------
+SBC Iteration 29/100
+  True parameters for this iteration: ['0.959', '1.214', '0.197', '0.341']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1044it [00:00, 17192.13it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(781), np.int64(183), np.int64(233), np.int64(7)]
+
+------------------------------
+SBC Iteration 30/100
+  True parameters for this iteration: ['1.280', '1.199', '0.261', '1.139']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1065it [00:00, 15656.15it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(444), np.int64(908), np.int64(168), np.int64(758)]
+
+------------------------------
+SBC Iteration 31/100
+  True parameters for this iteration: ['1.997', '1.174', '0.396', '0.529']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1251it [00:00, 14328.91it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(995), np.int64(13), np.int64(559), np.int64(168)]
+
+------------------------------
+SBC Iteration 32/100
+  True parameters for this iteration: ['1.759', '1.037', '0.209', '0.365']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1087it [00:00, 16267.55it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(581), np.int64(54), np.int64(687), np.int64(10)]
+
+------------------------------
+SBC Iteration 33/100
+  True parameters for this iteration: ['1.168', '0.831', '0.358', '0.781']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1060it [00:00, 16858.26it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(393), np.int64(555), np.int64(569), np.int64(792)]
+
+------------------------------
+SBC Iteration 34/100
+  True parameters for this iteration: ['0.873', '1.194', '0.066', '0.399']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1083it [00:00, 15916.07it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(702), np.int64(559), np.int64(54), np.int64(53)]
+
+------------------------------
+SBC Iteration 35/100
+  True parameters for this iteration: ['1.966', '1.006', '0.168', '0.543']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1205it [00:00, 13772.95it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(865), np.int64(278), np.int64(476), np.int64(972)]
+
+------------------------------
+SBC Iteration 36/100
+  True parameters for this iteration: ['0.567', '0.761', '0.132', '0.678']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1070it [00:00, 14670.67it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(841), np.int64(372), np.int64(151), np.int64(532)]
+
+------------------------------
+SBC Iteration 37/100
+  True parameters for this iteration: ['1.801', '0.494', '0.365', '0.506']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1077it [00:00, 17290.24it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(910), np.int64(8), np.int64(857), np.int64(139)]
+
+------------------------------
+SBC Iteration 38/100
+  True parameters for this iteration: ['0.972', '0.619', '0.342', '1.074']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1035it [00:00, 15137.40it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(378), np.int64(678), np.int64(440), np.int64(694)]
+
+------------------------------
+SBC Iteration 39/100
+  True parameters for this iteration: ['1.648', '1.010', '0.371', '0.536']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1029it [00:00, 15116.54it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(921), np.int64(174), np.int64(703), np.int64(872)]
+
+------------------------------
+SBC Iteration 40/100
+  True parameters for this iteration: ['1.405', '0.962', '0.412', '1.078']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1052it [00:00, 16209.39it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(449), np.int64(385), np.int64(754), np.int64(427)]
+
+------------------------------
+SBC Iteration 41/100
+  True parameters for this iteration: ['1.544', '0.804', '0.262', '1.155']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1047it [00:00, 15224.73it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(847), np.int64(213), np.int64(521), np.int64(944)]
+
+------------------------------
+SBC Iteration 42/100
+  True parameters for this iteration: ['1.406', '1.455', '0.246', '1.022']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1120it [00:00, 11249.66it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(200), np.int64(899), np.int64(46), np.int64(480)]
+
+------------------------------
+SBC Iteration 43/100
+  True parameters for this iteration: ['0.884', '1.384', '0.267', '0.685']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1066it [00:00, 16452.43it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(285), np.int64(668), np.int64(191), np.int64(614)]
+
+------------------------------
+SBC Iteration 44/100
+  True parameters for this iteration: ['1.266', '0.896', '0.453', '1.089']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1081it [00:00, 17014.06it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(454), np.int64(220), np.int64(862), np.int64(252)]
+
+------------------------------
+SBC Iteration 45/100
+  True parameters for this iteration: ['1.515', '0.486', '0.053', '0.454']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1283it [00:00, 13200.60it/s]                     
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(124), np.int64(635), np.int64(45), np.int64(605)]
+
+------------------------------
+SBC Iteration 46/100
+  True parameters for this iteration: ['1.930', '0.453', '0.299', '0.475']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1182it [00:00, 14119.54it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(944), np.int64(42), np.int64(999), np.int64(75)]
+
+------------------------------
+SBC Iteration 47/100
+  True parameters for this iteration: ['0.953', '0.637', '0.143', '1.121']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1045it [00:00, 16736.09it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(838), np.int64(316), np.int64(377), np.int64(845)]
+
+------------------------------
+SBC Iteration 48/100
+  True parameters for this iteration: ['0.744', '0.769', '0.458', '0.606']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1065it [00:00, 16238.91it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(928), np.int64(56), np.int64(960), np.int64(851)]
+
+------------------------------
+SBC Iteration 49/100
+  True parameters for this iteration: ['0.290', '1.120', '0.437', '0.364']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1053it [00:00, 16376.28it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(871), np.int64(124), np.int64(876), np.int64(9)]
+
+------------------------------
+SBC Iteration 50/100
+  True parameters for this iteration: ['0.553', '1.091', '0.477', '0.304']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1033it [00:00, 16562.94it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(863), np.int64(39), np.int64(980), np.int64(2)]
+
+------------------------------
+SBC Iteration 51/100
+  True parameters for this iteration: ['0.874', '1.326', '0.357', '0.757']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1029it [00:00, 18735.54it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(904), np.int64(546), np.int64(843), np.int64(985)]
+
+------------------------------
+SBC Iteration 52/100
+  True parameters for this iteration: ['0.791', '0.646', '0.080', '0.936']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1043it [00:00, 15469.91it/s]                     
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(331), np.int64(781), np.int64(106), np.int64(616)]
+
+------------------------------
+SBC Iteration 53/100
+  True parameters for this iteration: ['0.217', '0.770', '0.378', '0.407']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1036it [00:00, 17820.73it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(195), np.int64(87), np.int64(863), np.int64(110)]
+
+------------------------------
+SBC Iteration 54/100
+  True parameters for this iteration: ['0.912', '1.306', '0.056', '1.142']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1072it [00:00, 17356.92it/s]                     
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(272), np.int64(658), np.int64(4), np.int64(792)]
+
+------------------------------
+SBC Iteration 55/100
+  True parameters for this iteration: ['1.525', '1.052', '0.266', '1.052']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1045it [00:00, 16293.49it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(564), np.int64(868), np.int64(303), np.int64(493)]
+
+------------------------------
+SBC Iteration 56/100
+  True parameters for this iteration: ['0.461', '0.994', '0.250', '0.833']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1084it [00:00, 17211.24it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(334), np.int64(264), np.int64(864), np.int64(688)]
+
+------------------------------
+SBC Iteration 57/100
+  True parameters for this iteration: ['1.423', '1.257', '0.052', '0.675']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1039it [00:00, 15366.84it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(153), np.int64(972), np.int64(1), np.int64(847)]
+
+------------------------------
+SBC Iteration 58/100
+  True parameters for this iteration: ['1.093', '1.043', '0.454', '0.555']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1045it [00:00, 13271.87it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(821), np.int64(60), np.int64(964), np.int64(240)]
+
+------------------------------
+SBC Iteration 59/100
+  True parameters for this iteration: ['0.812', '1.431', '0.480', '1.094']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1212it [00:00, 15470.21it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(454), np.int64(718), np.int64(867), np.int64(866)]
+
+------------------------------
+SBC Iteration 60/100
+  True parameters for this iteration: ['0.125', '1.332', '0.100', '1.005']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1065it [00:00, 16974.15it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(29), np.int64(966), np.int64(6), np.int64(923)]
+
+------------------------------
+SBC Iteration 61/100
+  True parameters for this iteration: ['1.133', '0.684', '0.492', '0.760']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1061it [00:00, 17700.16it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(571), np.int64(26), np.int64(992), np.int64(167)]
+
+------------------------------
+SBC Iteration 62/100
+  True parameters for this iteration: ['0.414', '0.742', '0.223', '0.420']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1037it [00:00, 16341.83it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(563), np.int64(727), np.int64(110), np.int64(310)]
+
+------------------------------
+SBC Iteration 63/100
+  True parameters for this iteration: ['1.048', '0.752', '0.095', '1.044']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1149it [00:00, 14503.42it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(20), np.int64(819), np.int64(346), np.int64(601)]
+
+------------------------------
+SBC Iteration 64/100
+  True parameters for this iteration: ['1.325', '0.649', '0.259', '0.673']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1057it [00:00, 16753.69it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(633), np.int64(53), np.int64(851), np.int64(228)]
+
+------------------------------
+SBC Iteration 65/100
+  True parameters for this iteration: ['0.267', '1.015', '0.221', '0.747']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1054it [00:00, 16272.73it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(758), np.int64(270), np.int64(487), np.int64(176)]
+
+------------------------------
+SBC Iteration 66/100
+  True parameters for this iteration: ['1.293', '0.701', '0.094', '0.869']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1031it [00:00, 16364.53it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(44), np.int64(982), np.int64(106), np.int64(190)]
+
+------------------------------
+SBC Iteration 67/100
+  True parameters for this iteration: ['1.271', '0.963', '0.481', '0.434']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1048it [00:00, 16674.81it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(450), np.int64(150), np.int64(960), np.int64(492)]
+
+------------------------------
+SBC Iteration 68/100
+  True parameters for this iteration: ['1.779', '0.569', '0.230', '1.081']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1069it [00:00, 18157.38it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(868), np.int64(165), np.int64(768), np.int64(966)]
+
+------------------------------
+SBC Iteration 69/100
+  True parameters for this iteration: ['1.779', '1.231', '0.407', '0.551']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1096it [00:00, 16735.74it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(164), np.int64(177), np.int64(977), np.int64(210)]
+
+------------------------------
+SBC Iteration 70/100
+  True parameters for this iteration: ['0.895', '1.434', '0.347', '0.551']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1061it [00:00, 11621.60it/s]                     
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(85), np.int64(849), np.int64(663), np.int64(608)]
+
+------------------------------
+SBC Iteration 71/100
+  True parameters for this iteration: ['0.490', '0.493', '0.196', '0.361']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1047it [00:00, 16364.65it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(116), np.int64(228), np.int64(585), np.int64(40)]
+
+------------------------------
+SBC Iteration 72/100
+  True parameters for this iteration: ['0.241', '0.415', '0.334', '0.576']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1063it [00:00, 17630.65it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(245), np.int64(31), np.int64(695), np.int64(224)]
+
+------------------------------
+SBC Iteration 73/100
+  True parameters for this iteration: ['0.255', '1.111', '0.124', '1.189']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1050it [00:00, 16621.95it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(191), np.int64(989), np.int64(32), np.int64(987)]
+
+------------------------------
+SBC Iteration 74/100
+  True parameters for this iteration: ['0.611', '1.429', '0.060', '0.781']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1032it [00:00, 14914.52it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(128), np.int64(955), np.int64(23), np.int64(971)]
+
+------------------------------
+SBC Iteration 75/100
+  True parameters for this iteration: ['1.990', '0.982', '0.282', '0.374']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1063it [00:00, 15443.52it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(987), np.int64(32), np.int64(712), np.int64(438)]
+
+------------------------------
+SBC Iteration 76/100
+  True parameters for this iteration: ['0.262', '0.538', '0.229', '0.486']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1039it [00:00, 15751.48it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(205), np.int64(498), np.int64(500), np.int64(127)]
+
+------------------------------
+SBC Iteration 77/100
+  True parameters for this iteration: ['1.745', '0.630', '0.374', '0.813']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1075it [00:00, 16325.33it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(900), np.int64(241), np.int64(820), np.int64(915)]
+
+------------------------------
+SBC Iteration 78/100
+  True parameters for this iteration: ['0.240', '0.701', '0.269', '0.509']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1049it [00:00, 16649.10it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(188), np.int64(499), np.int64(302), np.int64(401)]
+
+------------------------------
+SBC Iteration 79/100
+  True parameters for this iteration: ['0.932', '0.650', '0.165', '0.962']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1058it [00:00, 17757.40it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(83), np.int64(844), np.int64(158), np.int64(729)]
+
+------------------------------
+SBC Iteration 80/100
+  True parameters for this iteration: ['1.179', '0.823', '0.358', '1.001']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1046it [00:00, 15808.80it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(838), np.int64(231), np.int64(442), np.int64(478)]
+
+------------------------------
+SBC Iteration 81/100
+  True parameters for this iteration: ['1.071', '1.427', '0.152', '0.353']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1190it [00:00, 14689.44it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(755), np.int64(582), np.int64(70), np.int64(160)]
+
+------------------------------
+SBC Iteration 82/100
+  True parameters for this iteration: ['1.792', '1.276', '0.255', '0.313']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1325it [00:00, 12923.32it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(763), np.int64(270), np.int64(397), np.int64(285)]
+
+------------------------------
+SBC Iteration 83/100
+  True parameters for this iteration: ['0.793', '0.716', '0.353', '0.347']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1052it [00:00, 15833.07it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(965), np.int64(68), np.int64(904), np.int64(176)]
+
+------------------------------
+SBC Iteration 84/100
+  True parameters for this iteration: ['0.948', '0.936', '0.050', '0.500']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1035it [00:00, 15537.80it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(592), np.int64(786), np.int64(2), np.int64(33)]
+
+------------------------------
+SBC Iteration 85/100
+  True parameters for this iteration: ['1.433', '1.383', '0.493', '0.805']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1151it [00:00, 14360.25it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(966), np.int64(488), np.int64(969), np.int64(923)]
+
+------------------------------
+SBC Iteration 86/100
+  True parameters for this iteration: ['1.044', '1.277', '0.247', '1.000']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1061it [00:00, 17496.81it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(375), np.int64(772), np.int64(427), np.int64(741)]
+
+------------------------------
+SBC Iteration 87/100
+  True parameters for this iteration: ['1.348', '0.930', '0.451', '1.160']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1087it [00:00, 16940.73it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(767), np.int64(189), np.int64(832), np.int64(829)]
+
+------------------------------
+SBC Iteration 88/100
+  True parameters for this iteration: ['1.607', '0.617', '0.257', '0.927']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1063it [00:00, 17409.73it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(375), np.int64(312), np.int64(642), np.int64(657)]
+
+------------------------------
+SBC Iteration 89/100
+  True parameters for this iteration: ['1.447', '0.537', '0.352', '1.123']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1082it [00:00, 16893.88it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(132), np.int64(420), np.int64(704), np.int64(766)]
+
+------------------------------
+SBC Iteration 90/100
+  True parameters for this iteration: ['0.925', '1.105', '0.388', '0.660']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1042it [00:00, 17031.01it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(506), np.int64(247), np.int64(748), np.int64(163)]
+
+------------------------------
+SBC Iteration 91/100
+  True parameters for this iteration: ['0.627', '0.576', '0.331', '0.483']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1044it [00:00, 17286.20it/s]                     
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(962), np.int64(220), np.int64(810), np.int64(677)]
+
+------------------------------
+SBC Iteration 92/100
+  True parameters for this iteration: ['1.271', '1.027', '0.118', '0.342']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1095it [00:00, 15736.62it/s]                     
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(111), np.int64(860), np.int64(61), np.int64(398)]
+
+------------------------------
+SBC Iteration 93/100
+  True parameters for this iteration: ['1.929', '0.858', '0.081', '1.188']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1131it [00:00, 16604.22it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(892), np.int64(800), np.int64(164), np.int64(988)]
+
+------------------------------
+SBC Iteration 94/100
+  True parameters for this iteration: ['0.378', '1.134', '0.232', '1.162']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1044it [00:00, 16517.93it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(895), np.int64(536), np.int64(176), np.int64(921)]
+
+------------------------------
+SBC Iteration 95/100
+  True parameters for this iteration: ['1.437', '1.315', '0.250', '1.198']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1124it [00:00, 16083.01it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(384), np.int64(817), np.int64(776), np.int64(983)]
+
+------------------------------
+SBC Iteration 96/100
+  True parameters for this iteration: ['0.666', '1.243', '0.397', '0.476']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1111it [00:00, 16817.18it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(522), np.int64(197), np.int64(641), np.int64(276)]
+
+------------------------------
+SBC Iteration 97/100
+  True parameters for this iteration: ['1.284', '1.017', '0.320', '0.837']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1068it [00:00, 17271.82it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(92), np.int64(213), np.int64(597), np.int64(69)]
+
+------------------------------
+SBC Iteration 98/100
+  True parameters for this iteration: ['0.707', '1.439', '0.447', '0.545']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1326it [00:00, 14192.65it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(339), np.int64(600), np.int64(682), np.int64(703)]
+
+------------------------------
+SBC Iteration 99/100
+  True parameters for this iteration: ['0.464', '0.651', '0.474', '0.508']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1060it [00:00, 14825.01it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(818), np.int64(438), np.int64(882), np.int64(655)]
+
+------------------------------
+SBC Iteration 100/100
+  True parameters for this iteration: ['0.777', '1.463', '0.400', '0.752']       
+  Drawing 1000 posterior samples from trained NPE...
+Drawing 1000 posterior samples: 1244it [00:00, 13814.18it/s]
+  Ranks for ['w_n_eff', 'a', 't', 'w_s']: [np.int64(696), np.int64(783), np.int64(239), np.int64(501)]
+
+============================================================
+Finished all SBC iterations. Processing and plotting results...
+SBC rank results saved to sbc_npe_results\sbc_results_npe_20250513_182431.csv    
+Combined SBC rank histogram plot saved to sbc_npe_results\sbc_hist_npe_allparams_20250513_182431.png
+
+SBC validation script (NPE) finished.

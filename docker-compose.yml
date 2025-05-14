@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  hegemonikon:
+    build:
+      context: .
+      dockerfile: docker/hddm.Dockerfile
+    ports:
+      - "8888:8888"  # Jupyter Lab port
+    volumes:
+      - .:/home/jovyan/work
+    working_dir: /home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - GRANT_SUDO=yes
+      - CHOWN_HOME=yes
+      - CHOWN_HOME_OPTS=-R
+    user: root
+    command: start.sh jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''

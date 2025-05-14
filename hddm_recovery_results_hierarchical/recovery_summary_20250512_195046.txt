@@ -1,0 +1,21 @@
+=== HDDM Parameter Recovery Test ===
+Date: 2025-05-12 19:50:48
+Configuration: Hierarchical model
+Subjects: 2
+Trials per subject: 50
+Samples: 100 (burn=50, thin=1)
+Parameters estimated: v, a, t
+
+True Parameters:
+  a: 1.5
+  v: 0.5
+  t: 0.2
+  z: 0.5
+  sv: 0.0
+  sz: 0.0
+  st: 0.0
+
+Recovery Results:
+  a: True=1.5000, Recovered=1.5768 (Error: 5.1%)
+  v: True=0.5000, Recovered=1.5331 (Error: 206.6%)
+  t: True=0.2000, Recovered=0.3334 (Error: 66.7%)
