@@ -1,0 +1,32 @@
+2025-05-17 08:58:40,431 - root - INFO - Fitting first 1 subjects.
+2025-05-17 08:58:40,433 - root - INFO - [DEBUG] Subject IDs to fit: [114]
+2025-05-17 08:58:40,433 - root - INFO - Starting empirical fitting process
+2025-05-17 08:58:40,435 - root - INFO - Number of subjects to fit: 1
+2025-05-17 08:58:40,435 - root - INFO - Subject IDs: [114]
+2025-05-17 08:58:40,439 - root - INFO - 
+================================================================================
+2025-05-17 08:58:40,439 - root - INFO - PROCESSING SUBJECT 114
+2025-05-17 08:58:40,440 - root - INFO - ================================================================================
+2025-05-17 08:58:40,442 - root - INFO - Found 284 trials for subject 114
+2025-05-17 08:58:40,479 - root - INFO - Subject 114 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-17 08:58:40,485 - root - ERROR - Sampling failed for 10 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-17 08:58:40,485 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-17 08:58:40,487 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-17 08:58:40,487 - root - ERROR - Error processing subject 114: All sampling attempts failed
+2025-05-17 08:58:43,409 - root - INFO - Empirical fitting script finished.
+2025-05-17 09:27:11,404 - root - INFO - Fitting first 1 subjects.
+2025-05-17 09:27:11,405 - root - INFO - [DEBUG] Subject IDs to fit: [114]
+2025-05-17 09:27:11,406 - root - INFO - Starting empirical fitting process
+2025-05-17 09:27:11,406 - root - INFO - Number of subjects to fit: 1
+2025-05-17 09:27:11,406 - root - INFO - Subject IDs: [114]
+2025-05-17 09:27:11,406 - root - INFO - 
+================================================================================
+2025-05-17 09:27:11,406 - root - INFO - PROCESSING SUBJECT 114
+2025-05-17 09:27:11,407 - root - INFO - ================================================================================
+2025-05-17 09:27:11,408 - root - INFO - Found 284 trials for subject 114
+2025-05-17 09:27:11,460 - root - INFO - Subject 114 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-17 09:27:11,461 - root - ERROR - Sampling failed for 10 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-17 09:27:11,461 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-17 09:27:11,462 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-17 09:27:11,462 - root - ERROR - Error processing subject 114: All sampling attempts failed
+2025-05-17 09:27:16,376 - root - INFO - Empirical fitting script finished.

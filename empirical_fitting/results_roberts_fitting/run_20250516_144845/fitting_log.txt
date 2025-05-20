@@ -1,0 +1,12 @@
+2025-05-16 23:39:45,230 - root - INFO - [DEBUG] Subject IDs to fit: [114 115 116 119 122 123 124 126 128 129 131 132 133 134 135 136 138 141
+ 142 143 144 145 146 147 148 149 151 154 155 156 159 160 162 164 165 166
+ 167 168 169 170 171 173 174 175 178]
+2025-05-16 23:39:45,230 - root - INFO - Starting empirical fitting process
+2025-05-16 23:39:45,230 - root - INFO - Number of subjects to fit: 45
+2025-05-16 23:39:45,230 - root - INFO - Subject IDs: [114, 115, 116, 119, 122, 123, 124, 126, 128, 129, 131, 132, 133, 134, 135, 136, 138, 141, 142, 143, 144, 145, 146, 147, 148, 149, 151, 154, 155, 156, 159, 160, 162, 164, 165, 166, 167, 168, 169, 170, 171, 173, 174, 175, 178]
+2025-05-16 23:39:45,230 - root - INFO - 
+================================================================================
+2025-05-16 23:39:45,230 - root - INFO - PROCESSING SUBJECT 114
+2025-05-16 23:39:45,230 - root - INFO - ================================================================================
+2025-05-16 23:39:45,230 - root - ERROR - Critical error during subject fitting: name 'posterior' is not defined
+2025-05-16 23:39:45,234 - root - INFO - Fitted NES parameters saved to C:\Users\jesse\Hegemonikon Project\hegemonikon\empirical_fitting\results_roberts_fitting\run_20250516_144845\data\roberts_fitted_nes_params_sims30000.csv

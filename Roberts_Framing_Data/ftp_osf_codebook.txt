@@ -1,0 +1,44 @@
+# ======================================================================= #
+# Time to pay attention?: Information search explains amplified framing
+# effects under time pressure
+# 
+# Authors: Roberts, I.D., Teoh, Y.Y., & Hutcherson, C.A.
+# ======================================================================= #
+
+OSF Data Codebook
+
+Variables:
+  * subject: subject ID number
+  * block: task block number
+  * trial: task trial number
+  * cond: time constraint condition
+      - ntc = no time constraint
+      - tc = time constraint
+  * timelimit: time limit for making a choice
+  * frame: framing condition for the sure option
+  * endow: endowment
+  * prob: probability of winning gamble
+  * sureOutcome: outcome displayed on the sure option
+  * choice: which option was chosen
+      - 1 = gamble
+      - 0 = sure option
+  * rt: response time in seconds
+  * firstFix: first option that was fixated
+  * fixBoth: whether both options were fixated before making a choice
+      - 1 = fixated both gamble and sure option
+      - 0 = fixated only one of the options
+  * trialType: whether the trial was a target trial or catch
+      - target = expected values of gamble and sure option are equivalent
+      - catch_sure = expected value of the sure option is greater than
+	the gamble
+      - catch_gamble = expected value of the gamble is greater than the
+	sure option
+  * gainColor: shade of grey used to indicate gains
+  * sureSide: side of the screen where the sure option was
+    displayed
+  
+
+Notes:
+  * Fixation data is NA for trials where the subject did not fixate
+    either option or for trials/blocks/subjects that met our
+    eye-tracking exclusion criteria (see manuscript and preregistration)

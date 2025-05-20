@@ -1,0 +1,68 @@
+2025-05-16 22:41:59,583 - root - INFO - Fitting first 2 subjects.
+2025-05-16 22:41:59,584 - root - INFO - [DEBUG] Subject IDs to fit: [114 115]
+2025-05-16 22:41:59,584 - root - INFO - Starting empirical fitting process
+2025-05-16 22:41:59,584 - root - INFO - Number of subjects to fit: 2
+2025-05-16 22:41:59,584 - root - INFO - Subject IDs: [114, 115]
+2025-05-16 22:41:59,585 - root - INFO - 
+================================================================================
+2025-05-16 22:41:59,585 - root - INFO - PROCESSING SUBJECT 114
+2025-05-16 22:41:59,585 - root - INFO - ================================================================================
+2025-05-16 22:41:59,587 - root - ERROR - Critical error during subject fitting: name 'posterior' is not defined
+2025-05-16 22:41:59,596 - root - INFO - Fitted NES parameters saved to C:\Users\jesse\Hegemonikon Project\hegemonikon\empirical_fitting\results_roberts_fitting\test_run\data\roberts_fitted_nes_params_sims100.csv
+2025-05-16 23:02:57,444 - root - INFO - Fitting first 2 subjects.
+2025-05-16 23:02:57,444 - root - INFO - [DEBUG] Subject IDs to fit: [114 115]
+2025-05-16 23:02:57,444 - root - INFO - Starting empirical fitting process
+2025-05-16 23:02:57,445 - root - INFO - Number of subjects to fit: 2
+2025-05-16 23:02:57,445 - root - INFO - Subject IDs: [114, 115]
+2025-05-16 23:02:57,445 - root - INFO - 
+================================================================================
+2025-05-16 23:02:57,445 - root - INFO - PROCESSING SUBJECT 114
+2025-05-16 23:02:57,445 - root - INFO - ================================================================================
+2025-05-16 23:02:57,445 - root - ERROR - Critical error during subject fitting: name 'posterior' is not defined
+2025-05-16 23:02:57,461 - root - INFO - SBC completed. Proceeding to empirical fitting...
+2025-05-16 23:08:54,925 - root - INFO - Fitting first 2 subjects.
+2025-05-16 23:08:54,927 - root - INFO - [DEBUG] Subject IDs to fit: [114 115]
+2025-05-16 23:08:54,927 - root - INFO - Starting empirical fitting process
+2025-05-16 23:08:54,927 - root - INFO - Number of subjects to fit: 2
+2025-05-16 23:08:54,927 - root - INFO - Subject IDs: [114, 115]
+2025-05-16 23:08:54,928 - root - INFO - 
+================================================================================
+2025-05-16 23:08:54,928 - root - INFO - PROCESSING SUBJECT 114
+2025-05-16 23:08:54,929 - root - INFO - ================================================================================
+2025-05-16 23:08:54,930 - root - INFO - Found 284 trials for subject 114
+2025-05-16 23:08:54,972 - root - INFO - Subject 114 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:08:54,975 - root - ERROR - Error processing subject 114: name 'posterior' is not defined
+2025-05-16 23:08:54,983 - root - INFO - 
+================================================================================
+2025-05-16 23:08:54,983 - root - INFO - PROCESSING SUBJECT 115
+2025-05-16 23:08:54,983 - root - INFO - ================================================================================
+2025-05-16 23:08:54,985 - root - INFO - Found 282 trials for subject 115
+2025-05-16 23:08:55,021 - root - INFO - Subject 115 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:08:55,022 - root - ERROR - Error processing subject 115: name 'posterior' is not defined
+2025-05-16 23:08:55,034 - root - INFO - SBC completed. Proceeding to empirical fitting...
+2025-05-16 23:12:19,313 - root - INFO - Fitting first 2 subjects.
+2025-05-16 23:12:19,314 - root - INFO - [DEBUG] Subject IDs to fit: [114 115]
+2025-05-16 23:12:19,315 - root - INFO - Starting empirical fitting process
+2025-05-16 23:12:19,315 - root - INFO - Number of subjects to fit: 2
+2025-05-16 23:12:19,315 - root - INFO - Subject IDs: [114, 115]
+2025-05-16 23:12:19,315 - root - INFO - 
+================================================================================
+2025-05-16 23:12:19,315 - root - INFO - PROCESSING SUBJECT 114
+2025-05-16 23:12:19,315 - root - INFO - ================================================================================
+2025-05-16 23:12:19,317 - root - INFO - Found 284 trials for subject 114
+2025-05-16 23:12:19,362 - root - INFO - Subject 114 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:12:19,363 - root - ERROR - Sampling failed for 200 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:12:19,364 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:12:19,364 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:12:19,366 - root - ERROR - Error processing subject 114: All sampling attempts failed
+2025-05-16 23:12:19,375 - root - INFO - 
+================================================================================
+2025-05-16 23:12:19,375 - root - INFO - PROCESSING SUBJECT 115
+2025-05-16 23:12:19,375 - root - INFO - ================================================================================
+2025-05-16 23:12:19,376 - root - INFO - Found 282 trials for subject 115
+2025-05-16 23:12:19,423 - root - INFO - Subject 115 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:12:19,424 - root - ERROR - Sampling failed for 200 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:12:19,424 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:12:19,424 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:12:19,425 - root - ERROR - Error processing subject 115: All sampling attempts failed
+2025-05-16 23:12:19,434 - root - INFO - SBC completed. Proceeding to empirical fitting...

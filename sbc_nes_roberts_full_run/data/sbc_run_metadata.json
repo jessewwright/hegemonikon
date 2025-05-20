@@ -1,0 +1,29 @@
+{
+    "npe_train_sims": 5000,
+    "template_trials": 100,
+    "sbc_datasets_attempted": 300,
+    "sbc_datasets_valid": 300,
+    "sbc_posterior_samples": 500,
+    "seed": 1747692845,
+    "output_dir": "sbc_nes_roberts_full_run",
+    "npe_save_path": "sbc_nes_roberts_full_run\\models\\nes_npe_sims5000_template100_seed1747692845.pt",
+    "timestamp": "2025-05-19 17:20:07",
+    "ks_results": {
+        "v_norm": {
+            "ks_stat": 0.03733333333333333,
+            "ks_pval": 0.7827430671216998
+        },
+        "a_0": {
+            "ks_stat": 0.11599999999999999,
+            "ks_pval": 0.0005663059706107499
+        },
+        "w_s_eff": {
+            "ks_stat": 0.06866666666666665,
+            "ks_pval": 0.1127264368115739
+        },
+        "t_0": {
+            "ks_stat": 0.12133333333333335,
+            "ks_pval": 0.00026291424780517026
+        }
+    }
+}

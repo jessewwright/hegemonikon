@@ -1,0 +1,33 @@
+{
+    "npe_train_sims": 30000,
+    "template_trials": 250,
+    "sbc_datasets_attempted": 300,
+    "sbc_datasets_valid": 300,
+    "sbc_posterior_samples": 500,
+    "seed": 2042,
+    "output_dir": "sbc_nes_roberts_5param_alpha_gain",
+    "npe_save_path": "sbc_nes_roberts_5param_alpha_gain\\models\\nes_npe_sims30000_template250_seed2042.pt",
+    "timestamp": "2025-05-19 20:04:53",
+    "ks_results": {
+        "v_norm": {
+            "ks_stat": 0.05999999999999994,
+            "ks_pval": 0.221275575895043
+        },
+        "a_0": {
+            "ks_stat": 0.0546666666666667,
+            "ks_pval": 0.31971109026594147
+        },
+        "w_s_eff": {
+            "ks_stat": 0.06133333333333335,
+            "ks_pval": 0.2006788242351205
+        },
+        "t_0": {
+            "ks_stat": 0.06066666666666665,
+            "ks_pval": 0.2107846107679071
+        },
+        "alpha_gain": {
+            "ks_stat": 0.06599999999999995,
+            "ks_pval": 0.1400961946813788
+        }
+    }
+}

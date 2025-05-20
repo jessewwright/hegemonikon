@@ -1,0 +1,8 @@
+{
+    "date_time": "2025-05-16 13:54:38",
+    "npe_training_sims": 10000,
+    "sbc_datasets": 5,
+    "template_trials": 100,
+    "posterior_samples": 500,
+    "seed": 2024
+}

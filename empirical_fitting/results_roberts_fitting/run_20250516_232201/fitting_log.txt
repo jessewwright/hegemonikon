@@ -1,0 +1,457 @@
+2025-05-16 23:42:07,563 - root - INFO - [DEBUG] Subject IDs to fit: [114 115 116 119 122 123 124 126 128 129 131 132 133 134 135 136 138 141
+ 142 143 144 145 146 147 148 149 151 154 155 156 159 160 162 164 165 166
+ 167 168 169 170 171 173 174 175 178]
+2025-05-16 23:42:07,563 - root - INFO - Starting empirical fitting process
+2025-05-16 23:42:07,563 - root - INFO - Number of subjects to fit: 45
+2025-05-16 23:42:07,563 - root - INFO - Subject IDs: [114, 115, 116, 119, 122, 123, 124, 126, 128, 129, 131, 132, 133, 134, 135, 136, 138, 141, 142, 143, 144, 145, 146, 147, 148, 149, 151, 154, 155, 156, 159, 160, 162, 164, 165, 166, 167, 168, 169, 170, 171, 173, 174, 175, 178]
+2025-05-16 23:42:07,563 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,563 - root - INFO - PROCESSING SUBJECT 114
+2025-05-16 23:42:07,563 - root - INFO - ================================================================================
+2025-05-16 23:42:07,563 - root - INFO - Found 284 trials for subject 114
+2025-05-16 23:42:07,574 - root - INFO - Subject 114 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,574 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,574 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,574 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,574 - root - ERROR - Error processing subject 114: All sampling attempts failed
+2025-05-16 23:42:07,578 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,578 - root - INFO - PROCESSING SUBJECT 115
+2025-05-16 23:42:07,578 - root - INFO - ================================================================================
+2025-05-16 23:42:07,579 - root - INFO - Found 282 trials for subject 115
+2025-05-16 23:42:07,589 - root - INFO - Subject 115 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,589 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,593 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,593 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,593 - root - ERROR - Error processing subject 115: All sampling attempts failed
+2025-05-16 23:42:07,611 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,611 - root - INFO - PROCESSING SUBJECT 116
+2025-05-16 23:42:07,611 - root - INFO - ================================================================================
+2025-05-16 23:42:07,613 - root - INFO - Found 278 trials for subject 116
+2025-05-16 23:42:07,632 - root - INFO - Subject 116 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,632 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,632 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,633 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,633 - root - ERROR - Error processing subject 116: All sampling attempts failed
+2025-05-16 23:42:07,636 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,636 - root - INFO - PROCESSING SUBJECT 119
+2025-05-16 23:42:07,636 - root - INFO - ================================================================================
+2025-05-16 23:42:07,637 - root - INFO - Found 247 trials for subject 119
+2025-05-16 23:42:07,652 - root - INFO - Subject 119 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,653 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,653 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,653 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,653 - root - ERROR - Error processing subject 119: All sampling attempts failed
+2025-05-16 23:42:07,656 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,656 - root - INFO - PROCESSING SUBJECT 122
+2025-05-16 23:42:07,656 - root - INFO - ================================================================================
+2025-05-16 23:42:07,658 - root - INFO - Found 286 trials for subject 122
+2025-05-16 23:42:07,673 - root - INFO - Subject 122 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,674 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,674 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,674 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,674 - root - ERROR - Error processing subject 122: All sampling attempts failed
+2025-05-16 23:42:07,677 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,678 - root - INFO - PROCESSING SUBJECT 123
+2025-05-16 23:42:07,678 - root - INFO - ================================================================================
+2025-05-16 23:42:07,679 - root - INFO - Found 272 trials for subject 123
+2025-05-16 23:42:07,692 - root - INFO - Subject 123 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,692 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,692 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,692 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,692 - root - ERROR - Error processing subject 123: All sampling attempts failed
+2025-05-16 23:42:07,695 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,695 - root - INFO - PROCESSING SUBJECT 124
+2025-05-16 23:42:07,695 - root - INFO - ================================================================================
+2025-05-16 23:42:07,696 - root - INFO - Found 284 trials for subject 124
+2025-05-16 23:42:07,707 - root - INFO - Subject 124 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,707 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,707 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,707 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,707 - root - ERROR - Error processing subject 124: All sampling attempts failed
+2025-05-16 23:42:07,710 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,710 - root - INFO - PROCESSING SUBJECT 126
+2025-05-16 23:42:07,711 - root - INFO - ================================================================================
+2025-05-16 23:42:07,711 - root - INFO - Found 285 trials for subject 126
+2025-05-16 23:42:07,724 - root - INFO - Subject 126 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,724 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,724 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,724 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,724 - root - ERROR - Error processing subject 126: All sampling attempts failed
+2025-05-16 23:42:07,727 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,728 - root - INFO - PROCESSING SUBJECT 128
+2025-05-16 23:42:07,728 - root - INFO - ================================================================================
+2025-05-16 23:42:07,728 - root - INFO - Found 270 trials for subject 128
+2025-05-16 23:42:07,741 - root - INFO - Subject 128 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,742 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,742 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,742 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,743 - root - ERROR - Error processing subject 128: All sampling attempts failed
+2025-05-16 23:42:07,745 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,745 - root - INFO - PROCESSING SUBJECT 129
+2025-05-16 23:42:07,745 - root - INFO - ================================================================================
+2025-05-16 23:42:07,746 - root - INFO - Found 286 trials for subject 129
+2025-05-16 23:42:07,762 - root - INFO - Subject 129 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,763 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,764 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,764 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,764 - root - ERROR - Error processing subject 129: All sampling attempts failed
+2025-05-16 23:42:07,766 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,767 - root - INFO - PROCESSING SUBJECT 131
+2025-05-16 23:42:07,767 - root - INFO - ================================================================================
+2025-05-16 23:42:07,768 - root - INFO - Found 281 trials for subject 131
+2025-05-16 23:42:07,784 - root - INFO - Subject 131 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,785 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,785 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,785 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,785 - root - ERROR - Error processing subject 131: All sampling attempts failed
+2025-05-16 23:42:07,788 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,789 - root - INFO - PROCESSING SUBJECT 132
+2025-05-16 23:42:07,789 - root - INFO - ================================================================================
+2025-05-16 23:42:07,789 - root - INFO - Found 288 trials for subject 132
+2025-05-16 23:42:07,804 - root - INFO - Subject 132 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,804 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,804 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,804 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,804 - root - ERROR - Error processing subject 132: All sampling attempts failed
+2025-05-16 23:42:07,806 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,806 - root - INFO - PROCESSING SUBJECT 133
+2025-05-16 23:42:07,806 - root - INFO - ================================================================================
+2025-05-16 23:42:07,807 - root - INFO - Found 287 trials for subject 133
+2025-05-16 23:42:07,820 - root - INFO - Subject 133 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,821 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,821 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,822 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,822 - root - ERROR - Error processing subject 133: All sampling attempts failed
+2025-05-16 23:42:07,825 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,825 - root - INFO - PROCESSING SUBJECT 134
+2025-05-16 23:42:07,825 - root - INFO - ================================================================================
+2025-05-16 23:42:07,826 - root - INFO - Found 282 trials for subject 134
+2025-05-16 23:42:07,839 - root - INFO - Subject 134 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,840 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,840 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,840 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,840 - root - ERROR - Error processing subject 134: All sampling attempts failed
+2025-05-16 23:42:07,843 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,843 - root - INFO - PROCESSING SUBJECT 135
+2025-05-16 23:42:07,843 - root - INFO - ================================================================================
+2025-05-16 23:42:07,845 - root - INFO - Found 284 trials for subject 135
+2025-05-16 23:42:07,855 - root - INFO - Subject 135 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,855 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,855 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,855 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,855 - root - ERROR - Error processing subject 135: All sampling attempts failed
+2025-05-16 23:42:07,857 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,857 - root - INFO - PROCESSING SUBJECT 136
+2025-05-16 23:42:07,857 - root - INFO - ================================================================================
+2025-05-16 23:42:07,858 - root - INFO - Found 282 trials for subject 136
+2025-05-16 23:42:07,867 - root - INFO - Subject 136 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,868 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,868 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,868 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,868 - root - ERROR - Error processing subject 136: All sampling attempts failed
+2025-05-16 23:42:07,869 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,869 - root - INFO - PROCESSING SUBJECT 138
+2025-05-16 23:42:07,869 - root - INFO - ================================================================================
+2025-05-16 23:42:07,870 - root - INFO - Found 284 trials for subject 138
+2025-05-16 23:42:07,883 - root - INFO - Subject 138 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,884 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,884 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,884 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,884 - root - ERROR - Error processing subject 138: All sampling attempts failed
+2025-05-16 23:42:07,887 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,887 - root - INFO - PROCESSING SUBJECT 141
+2025-05-16 23:42:07,887 - root - INFO - ================================================================================
+2025-05-16 23:42:07,887 - root - INFO - Found 286 trials for subject 141
+2025-05-16 23:42:07,901 - root - INFO - Subject 141 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,901 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,901 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,901 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,901 - root - ERROR - Error processing subject 141: All sampling attempts failed
+2025-05-16 23:42:07,904 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,904 - root - INFO - PROCESSING SUBJECT 142
+2025-05-16 23:42:07,904 - root - INFO - ================================================================================
+2025-05-16 23:42:07,905 - root - INFO - Found 287 trials for subject 142
+2025-05-16 23:42:07,916 - root - INFO - Subject 142 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,916 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,916 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,916 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,916 - root - ERROR - Error processing subject 142: All sampling attempts failed
+2025-05-16 23:42:07,918 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,920 - root - INFO - PROCESSING SUBJECT 143
+2025-05-16 23:42:07,920 - root - INFO - ================================================================================
+2025-05-16 23:42:07,920 - root - INFO - Found 270 trials for subject 143
+2025-05-16 23:42:07,932 - root - INFO - Subject 143 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,932 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,933 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,933 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,933 - root - ERROR - Error processing subject 143: All sampling attempts failed
+2025-05-16 23:42:07,935 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,935 - root - INFO - PROCESSING SUBJECT 144
+2025-05-16 23:42:07,935 - root - INFO - ================================================================================
+2025-05-16 23:42:07,936 - root - INFO - Found 283 trials for subject 144
+2025-05-16 23:42:07,946 - root - INFO - Subject 144 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,947 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,947 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,947 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,947 - root - ERROR - Error processing subject 144: All sampling attempts failed
+2025-05-16 23:42:07,949 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,949 - root - INFO - PROCESSING SUBJECT 145
+2025-05-16 23:42:07,949 - root - INFO - ================================================================================
+2025-05-16 23:42:07,950 - root - INFO - Found 281 trials for subject 145
+2025-05-16 23:42:07,960 - root - INFO - Subject 145 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,961 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,961 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,961 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,962 - root - ERROR - Error processing subject 145: All sampling attempts failed
+2025-05-16 23:42:07,966 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,966 - root - INFO - PROCESSING SUBJECT 146
+2025-05-16 23:42:07,966 - root - INFO - ================================================================================
+2025-05-16 23:42:07,966 - root - INFO - Found 277 trials for subject 146
+2025-05-16 23:42:07,979 - root - INFO - Subject 146 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,980 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,980 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,980 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,980 - root - ERROR - Error processing subject 146: All sampling attempts failed
+2025-05-16 23:42:07,982 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,982 - root - INFO - PROCESSING SUBJECT 147
+2025-05-16 23:42:07,982 - root - INFO - ================================================================================
+2025-05-16 23:42:07,982 - root - INFO - Found 286 trials for subject 147
+2025-05-16 23:42:07,992 - root - INFO - Subject 147 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:07,992 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,992 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,992 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:07,994 - root - ERROR - Error processing subject 147: All sampling attempts failed
+2025-05-16 23:42:07,994 - root - INFO - 
+================================================================================
+2025-05-16 23:42:07,994 - root - INFO - PROCESSING SUBJECT 148
+2025-05-16 23:42:07,994 - root - INFO - ================================================================================
+2025-05-16 23:42:07,996 - root - INFO - Found 287 trials for subject 148
+2025-05-16 23:42:08,010 - root - INFO - Subject 148 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,010 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,010 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,010 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,010 - root - ERROR - Error processing subject 148: All sampling attempts failed
+2025-05-16 23:42:08,012 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,012 - root - INFO - PROCESSING SUBJECT 149
+2025-05-16 23:42:08,012 - root - INFO - ================================================================================
+2025-05-16 23:42:08,013 - root - INFO - Found 282 trials for subject 149
+2025-05-16 23:42:08,022 - root - INFO - Subject 149 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,023 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,023 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,023 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,023 - root - ERROR - Error processing subject 149: All sampling attempts failed
+2025-05-16 23:42:08,025 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,025 - root - INFO - PROCESSING SUBJECT 151
+2025-05-16 23:42:08,025 - root - INFO - ================================================================================
+2025-05-16 23:42:08,025 - root - INFO - Found 285 trials for subject 151
+2025-05-16 23:42:08,036 - root - INFO - Subject 151 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,036 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,036 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,036 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,036 - root - ERROR - Error processing subject 151: All sampling attempts failed
+2025-05-16 23:42:08,039 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,039 - root - INFO - PROCESSING SUBJECT 154
+2025-05-16 23:42:08,039 - root - INFO - ================================================================================
+2025-05-16 23:42:08,039 - root - INFO - Found 248 trials for subject 154
+2025-05-16 23:42:08,053 - root - INFO - Subject 154 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,053 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,054 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,054 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,054 - root - ERROR - Error processing subject 154: All sampling attempts failed
+2025-05-16 23:42:08,056 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,056 - root - INFO - PROCESSING SUBJECT 155
+2025-05-16 23:42:08,056 - root - INFO - ================================================================================
+2025-05-16 23:42:08,057 - root - INFO - Found 279 trials for subject 155
+2025-05-16 23:42:08,067 - root - INFO - Subject 155 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,067 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,067 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,067 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,067 - root - ERROR - Error processing subject 155: All sampling attempts failed
+2025-05-16 23:42:08,070 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,070 - root - INFO - PROCESSING SUBJECT 156
+2025-05-16 23:42:08,070 - root - INFO - ================================================================================
+2025-05-16 23:42:08,071 - root - INFO - Found 281 trials for subject 156
+2025-05-16 23:42:08,085 - root - INFO - Subject 156 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,085 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,085 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,086 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,086 - root - ERROR - Error processing subject 156: All sampling attempts failed
+2025-05-16 23:42:08,089 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,089 - root - INFO - PROCESSING SUBJECT 159
+2025-05-16 23:42:08,089 - root - INFO - ================================================================================
+2025-05-16 23:42:08,090 - root - INFO - Found 253 trials for subject 159
+2025-05-16 23:42:08,101 - root - INFO - Subject 159 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,102 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,102 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,102 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,102 - root - ERROR - Error processing subject 159: All sampling attempts failed
+2025-05-16 23:42:08,104 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,104 - root - INFO - PROCESSING SUBJECT 160
+2025-05-16 23:42:08,104 - root - INFO - ================================================================================
+2025-05-16 23:42:08,105 - root - INFO - Found 286 trials for subject 160
+2025-05-16 23:42:08,119 - root - INFO - Subject 160 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,120 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,120 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,120 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,120 - root - ERROR - Error processing subject 160: All sampling attempts failed
+2025-05-16 23:42:08,122 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,122 - root - INFO - PROCESSING SUBJECT 162
+2025-05-16 23:42:08,122 - root - INFO - ================================================================================
+2025-05-16 23:42:08,123 - root - INFO - Found 281 trials for subject 162
+2025-05-16 23:42:08,134 - root - INFO - Subject 162 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,134 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,134 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,134 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,134 - root - ERROR - Error processing subject 162: All sampling attempts failed
+2025-05-16 23:42:08,136 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,137 - root - INFO - PROCESSING SUBJECT 164
+2025-05-16 23:42:08,137 - root - INFO - ================================================================================
+2025-05-16 23:42:08,137 - root - INFO - Found 280 trials for subject 164
+2025-05-16 23:42:08,148 - root - INFO - Subject 164 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,148 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,148 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,148 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,148 - root - ERROR - Error processing subject 164: All sampling attempts failed
+2025-05-16 23:42:08,150 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,150 - root - INFO - PROCESSING SUBJECT 165
+2025-05-16 23:42:08,151 - root - INFO - ================================================================================
+2025-05-16 23:42:08,151 - root - INFO - Found 277 trials for subject 165
+2025-05-16 23:42:08,165 - root - INFO - Subject 165 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,166 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,166 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,166 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,166 - root - ERROR - Error processing subject 165: All sampling attempts failed
+2025-05-16 23:42:08,170 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,170 - root - INFO - PROCESSING SUBJECT 166
+2025-05-16 23:42:08,171 - root - INFO - ================================================================================
+2025-05-16 23:42:08,171 - root - INFO - Found 275 trials for subject 166
+2025-05-16 23:42:08,187 - root - INFO - Subject 166 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,188 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,188 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,188 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,188 - root - ERROR - Error processing subject 166: All sampling attempts failed
+2025-05-16 23:42:08,192 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,192 - root - INFO - PROCESSING SUBJECT 167
+2025-05-16 23:42:08,192 - root - INFO - ================================================================================
+2025-05-16 23:42:08,193 - root - INFO - Found 281 trials for subject 167
+2025-05-16 23:42:08,220 - root - INFO - Subject 167 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,221 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,221 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,221 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,222 - root - ERROR - Error processing subject 167: All sampling attempts failed
+2025-05-16 23:42:08,225 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,226 - root - INFO - PROCESSING SUBJECT 168
+2025-05-16 23:42:08,226 - root - INFO - ================================================================================
+2025-05-16 23:42:08,227 - root - INFO - Found 283 trials for subject 168
+2025-05-16 23:42:08,243 - root - INFO - Subject 168 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,243 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,243 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,244 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,244 - root - ERROR - Error processing subject 168: All sampling attempts failed
+2025-05-16 23:42:08,247 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,247 - root - INFO - PROCESSING SUBJECT 169
+2025-05-16 23:42:08,247 - root - INFO - ================================================================================
+2025-05-16 23:42:08,248 - root - INFO - Found 277 trials for subject 169
+2025-05-16 23:42:08,261 - root - INFO - Subject 169 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,262 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,262 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,262 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,262 - root - ERROR - Error processing subject 169: All sampling attempts failed
+2025-05-16 23:42:08,264 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,264 - root - INFO - PROCESSING SUBJECT 170
+2025-05-16 23:42:08,264 - root - INFO - ================================================================================
+2025-05-16 23:42:08,265 - root - INFO - Found 286 trials for subject 170
+2025-05-16 23:42:08,275 - root - INFO - Subject 170 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,275 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,275 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,275 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,275 - root - ERROR - Error processing subject 170: All sampling attempts failed
+2025-05-16 23:42:08,277 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,277 - root - INFO - PROCESSING SUBJECT 171
+2025-05-16 23:42:08,277 - root - INFO - ================================================================================
+2025-05-16 23:42:08,278 - root - INFO - Found 247 trials for subject 171
+2025-05-16 23:42:08,292 - root - INFO - Subject 171 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,293 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,293 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,293 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,293 - root - ERROR - Error processing subject 171: All sampling attempts failed
+2025-05-16 23:42:08,297 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,297 - root - INFO - PROCESSING SUBJECT 173
+2025-05-16 23:42:08,297 - root - INFO - ================================================================================
+2025-05-16 23:42:08,298 - root - INFO - Found 287 trials for subject 173
+2025-05-16 23:42:08,313 - root - INFO - Subject 173 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,314 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,314 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,314 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,314 - root - ERROR - Error processing subject 173: All sampling attempts failed
+2025-05-16 23:42:08,317 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,317 - root - INFO - PROCESSING SUBJECT 174
+2025-05-16 23:42:08,317 - root - INFO - ================================================================================
+2025-05-16 23:42:08,317 - root - INFO - Found 279 trials for subject 174
+2025-05-16 23:42:08,330 - root - INFO - Subject 174 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,330 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,330 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,330 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,330 - root - ERROR - Error processing subject 174: All sampling attempts failed
+2025-05-16 23:42:08,333 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,333 - root - INFO - PROCESSING SUBJECT 175
+2025-05-16 23:42:08,333 - root - INFO - ================================================================================
+2025-05-16 23:42:08,333 - root - INFO - Found 281 trials for subject 175
+2025-05-16 23:42:08,345 - root - INFO - Subject 175 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,345 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,345 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,345 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,345 - root - ERROR - Error processing subject 175: All sampling attempts failed
+2025-05-16 23:42:08,348 - root - INFO - 
+================================================================================
+2025-05-16 23:42:08,348 - root - INFO - PROCESSING SUBJECT 178
+2025-05-16 23:42:08,348 - root - INFO - ================================================================================
+2025-05-16 23:42:08,349 - root - INFO - Found 282 trials for subject 178
+2025-05-16 23:42:08,361 - root - INFO - Subject 178 summary stats: 0 NaNs, 0 infs, 2 missing values
+2025-05-16 23:42:08,361 - root - ERROR - Sampling failed for 500 samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,362 - root - ERROR - Sampling failed for reduced samples: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,362 - root - ERROR - All sampling attempts failed: The trailing dimensions of `theta_or_x` do not match the `event_shape`.
+2025-05-16 23:42:08,362 - root - ERROR - Error processing subject 178: All sampling attempts failed
+2025-05-16 23:42:08,367 - root - INFO - SBC completed. Proceeding to empirical fitting...

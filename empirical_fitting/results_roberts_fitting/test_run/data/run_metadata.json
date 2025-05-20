@@ -1,0 +1,8 @@
+{
+    "date_time": "2025-05-16 23:12:19",
+    "npe_training_sims": 100,
+    "posterior_samples": 200,
+    "template_trials": 100,
+    "subjects_fitted": 2,
+    "seed": 2024
+}

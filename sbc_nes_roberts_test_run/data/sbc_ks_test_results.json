@@ -1,0 +1,18 @@
+{
+    "v_norm": {
+        "ks_stat": 1.0,
+        "ks_pval": 0.0
+    },
+    "a_0": {
+        "ks_stat": 1.0,
+        "ks_pval": 0.0
+    },
+    "w_s_eff": {
+        "ks_stat": 1.0,
+        "ks_pval": 0.0
+    },
+    "t_0": {
+        "ks_stat": 1.0,
+        "ks_pval": 0.0
+    }
+}

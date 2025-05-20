@@ -28,7 +28,8 @@ class MVNESAgent:
                     'noise_std_dev': NOISE_STD_DEV,
                     'dt': DT,
                     'max_time': MAX_TIME,
-                    'affect_stress_threshold_reduction': AFFECT_STRESS_THRESHOLD_REDUCTION
+                    'affect_stress_threshold_reduction': AFFECT_STRESS_THRESHOLD_REDUCTION,
+                    'alpha_gain': 1.0  # Default: no modulation
                 }
             except ImportError:
                 print("Warning: Could not import from agent_config. Using default parameters.")
@@ -40,7 +41,8 @@ class MVNESAgent:
                     'noise_std_dev': 1.0,
                     'dt': 0.01,
                     'max_time': 2.0,
-                    'affect_stress_threshold_reduction': -0.3
+                    'affect_stress_threshold_reduction': -0.3,
+                    'alpha_gain': 1.0  # Default: no modulation
                 }
         
         self.config = config
@@ -75,12 +77,20 @@ class MVNESAgent:
         # Extract parameters
         w_s = params['w_s']
         w_n = params['w_n']
-        a = params['threshold_a'] # Decision threshold boundary
-        
+        base_threshold_a = params.get('threshold_a', self.config.get('threshold_a', 1.0))
+        alpha_gain_val = params.get('alpha_gain', self.config.get('alpha_gain', 1.0))
+
         # Adjust threshold for stress condition if present
         if params.get('affect_stress', False):
-            a += params.get('stress_threshold_reduction', -0.3)
-        
+            base_threshold_a += params.get('stress_threshold_reduction', -0.3)
+
+        # Determine effective threshold: modulate for Gain frame only
+        # By convention: norm_input > 0 means Gain frame, else Loss frame
+        if norm_input > 0:
+            effective_threshold_a = base_threshold_a * alpha_gain_val
+        else:
+            effective_threshold_a = base_threshold_a
+
         t = params['t']           # Non-decision time
         sigma = params['noise_std_dev']
         dt = params['dt']
@@ -96,39 +106,35 @@ class MVNESAgent:
                 'timeout': False
             }
 
-        # Calculate effective drift rate: v = w_s*S + w_n*N_eff
-        # For Go/No-Go:
-        # Go trial: S=+1 (e.g.), N=0  => v = w_s
-        # NoGo trial: S can be 0 or slightly positive (go impulse), N=1 (inhibit signal)
-        # Let's assume N represents the *inhibitory* push against Go.
-        # So, on NoGo, the norm tries to *reduce* the effective drift.
-        # A simple way: v = w_s * salience_input - w_n * norm_input
-        #   - Go Trial (S=1, N=0): v = w_s * 1 - w_n * 0 = w_s (positive drift -> Go)
-        #   - NoGo Trial (S=1, N=1): v = w_s * 1 - w_n * 1 = w_s - w_n
-        #        If w_n > w_s, drift is negative -> Inhibit likely
-        #        If w_n < w_s, drift is positive -> False Alarm likely
-        # (Assuming salience_input is the 'Go' drive, norm_input is 'Stop' drive)
+        # Calculate effective drift rate: v = w_s*S - w_n*N
         drift_rate = w_s * salience_input - w_n * norm_input
 
         # DDM simulation loop (single boundary crossing for Go)
         evidence = 0.0 # Start at 0 (unbiased start point)
         accumulated_time = 0.0
         noise_scaler = sigma * np.sqrt(dt) # Wiener noise std dev for simulation step
-        # We only need to check for crossing the positive threshold 'a' for a "Go" response
-        # If drift is negative (strong inhibition), evidence will move away from 'a'
-        threshold_boundary = a # Single boundary for Go response
+        # We only need to check for crossing the positive threshold for a "Go" response
+        threshold_boundary = effective_threshold_a # Use modulated threshold
         evidence_trace = [evidence]  # Track evidence accumulation
 
-        max_decision_time = max_time - t
+        max_decision_time = max(dt, max_time - t)  # Ensure at least one step
         if max_decision_time <= 0:
             # Non-decision time exceeds max time - automatically inhibit / timeout
             return {'choice': 0, 'rt': max_time, 'trace': evidence_trace, 'timeout': True} # Treat as inhibited
 
+        max_steps = int(max_decision_time / dt)
+        ABSOLUTE_MAX_STEPS = 20000  # Hard cap to prevent runaway loops
+        step_count = 0
         while accumulated_time < max_decision_time:
+            if step_count >= ABSOLUTE_MAX_STEPS:
+                import logging
+                logging.debug(f"DDM absolute_max_steps ({ABSOLUTE_MAX_STEPS}) reached.")
+                return {'choice': 0, 'rt': max_time, 'trace': evidence_trace, 'timeout': True}
             noise = np.random.normal(0, noise_scaler)
             evidence += drift_rate * dt + noise
             accumulated_time += dt
             evidence_trace.append(evidence)  # Record evidence at each step
+            step_count += 1
 
             if evidence >= threshold_boundary:
                 # Threshold crossed - Go response initiated
@@ -225,45 +231,46 @@ if __name__ == "__main__":
         'dt': DT,
         'max_time': MAX_TIME,
         'affect_stress_threshold_reduction': AFFECT_STRESS_THRESHOLD_REDUCTION,
-        'veto_flag': VETO_FLAG
+        'veto_flag': VETO_FLAG,
+        'alpha_gain': 0.7  # Example: modulate threshold for Gain frames
     }
 
-    print("\nTest 1: Basic Go Trial (No Veto)")
-    go_results = []
+    print("\nTest 1: Go Trial (Loss frame, alpha_gain not applied)")
+    go_loss_results = []
     for _ in range(10):
-        # Go trial: High salience (S=1), No norm input (N=0)
+        # Go trial: Loss frame (norm_input = -1)
         agent = MVNESAgent()
-        result = agent.run_mvnes_trial(salience_input=1.0, norm_input=0.0, params=test_params)
-        go_results.append(result)
-    df = pd.DataFrame(go_results).round(3)
-    print("\nGo Trial Results:")
+        result = agent.run_mvnes_trial(salience_input=1.0, norm_input=-1.0, params=test_params)
+        go_loss_results.append(result)
+    df = pd.DataFrame(go_loss_results).round(3)
+    print("\nGo Trial (Loss frame) Results:")
     print(df)
     print(f"Go Rate: {(df['choice'] == 1).mean():.2f}")
 
-    print("\nTest 2: NoGo Trial (No Veto)")
-    nogo_results = []
+    print("\nTest 2: Go Trial (Gain frame, alpha_gain applied)")
+    go_gain_results = []
     for _ in range(10):
-        # NoGo trial: Strong norm input (N=1)
+        # Go trial: Gain frame (norm_input = +1)
         agent = MVNESAgent()
         result = agent.run_mvnes_trial(salience_input=1.0, norm_input=1.0, params=test_params)
-        nogo_results.append(result)
-    df = pd.DataFrame(nogo_results).round(3)
-    print("\nNoGo Trial Results:")
+        go_gain_results.append(result)
+    df = pd.DataFrame(go_gain_results).round(3)
+    print("\nGo Trial (Gain frame) Results:")
     print(df)
-    print(f"False Alarm Rate: {(df['choice'] == 1).mean():.2f}")
+    print(f"Go Rate: {(df['choice'] == 1).mean():.2f}")
 
-    print("\nTest 3: NoGo Trial with Veto")
+    print("\nTest 3: NoGo Trial with Veto (Gain frame)")
     # Enable veto flag and test again
     test_params_veto = test_params.copy()
     test_params_veto['veto_flag'] = True
     nogo_veto_results = []
     for _ in range(10):
-        # NoGo trial with veto enabled
+        # NoGo trial with veto enabled (norm_input = +1, Gain frame)
         agent = MVNESAgent()
         result = agent.run_mvnes_trial(salience_input=1.0, norm_input=1.0, params=test_params_veto)
         nogo_veto_results.append(result)
     df = pd.DataFrame(nogo_veto_results).round(3)
-    print("\nNoGo Trial Results with Veto:")
+    print("\nNoGo Trial Results with Veto (Gain frame):")
     print(df)
     print(f"False Alarm Rate: {(df['choice'] == 1).mean():.2f}")
     print(f"Average RT: {df['rt'].mean():.3f}")
