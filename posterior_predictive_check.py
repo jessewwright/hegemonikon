@@ -165,47 +165,225 @@ def simulate_subject_data(subj_id, df_subj, params):
     
     return pd.DataFrame(sim_results)
 
-def calculate_summary_stats(df):
-    """Calculate summary statistics for the data"""
+def calculate_summary_stats(df, subject_id=None, rep_idx=None):
+    """Calculate summary statistics for the data
+    
+    Args:
+        df: DataFrame containing the trial data
+        subject_id: Optional subject ID for logging
+        rep_idx: Optional repetition index for logging
+        
+    Returns:
+        Dictionary with all statistics defined in ROBERTS_SUMMARY_STAT_KEYS
+    """
+    # Set up debugging context
+    debug_ctx = {
+        'subject_id': subject_id if subject_id is not None else 'UNKNOWN_SUBJ',
+        'rep_idx': rep_idx if rep_idx is not None else 'UNKNOWN_REP',
+        'n_rows': len(df) if df is not None else 0,
+        'columns': list(df.columns) if df is not None else []
+    }
+    
+    def log_debug(key, value, value_type=None):
+        """Helper to log debug information with context"""
+        try:
+            value_repr = repr(value)
+            if value_type is None:
+                value_type = type(value).__name__
+            logging.debug(
+                f"[STATS_DEBUG] Subj: {debug_ctx['subject_id']}, "
+                f"Rep: {debug_ctx['rep_idx']}, "
+                f"Key: '{key}', Value type: {value_type}, "
+                f"Value: {value_repr}"
+            )
+        except Exception as e:
+            logging.warning(f"Error in log_debug: {str(e)}")
+    
     stats = {}
+    
+    # Helper function to calculate quantiles safely
+    def safe_quantile(data, q, stat_name):
+        try:
+            if len(data) == 0 or pd.isna(data).all():
+                log_debug(stat_name, np.nan, 'empty_or_all_nan')
+                return np.nan
+            result = np.nanquantile(data, q)
+            log_debug(f"{stat_name}_q{int(q*100)}", result, 'quantile')
+            return result
+        except Exception as e:
+            logging.warning(f"Error in safe_quantile for {stat_name} q{q}: {str(e)}")
+            return np.nan
+    
+    # Filter out invalid trials if present
+    if 'valid' in df.columns:
+        df = df[df['valid']].copy()
+    
+    # Ensure we have valid RT values
+    valid_rt = (df['rt'] > 0.1) & (df['rt'] < 10.0)
+    
+    # Log basic info about the input data
+    log_debug('input_data_shape', df.shape, 'shape')
+    log_debug('input_columns', list(df.columns), 'list')
+    log_debug('n_valid_choice', valid_choice.sum(), 'int')
+    log_debug('n_valid_rt', valid_rt.sum(), 'int')
     
     # Overall stats
     valid_choice = ~df['choice'].isna()
     valid_rt = ~df['rt'].isna()
     
-    stats['prop_gamble_overall'] = df.loc[valid_choice, 'choice'].mean() if valid_choice.any() else np.nan
-    stats['mean_rt_overall'] = df.loc[valid_rt, 'rt'].mean() if valid_rt.any() else np.nan
+    # Core overall stats with detailed logging
+    try:
+        stats['prop_gamble_overall'] = df.loc[valid_choice, 'choice'].mean() if valid_choice.any() else np.nan
+        log_debug('prop_gamble_overall', stats['prop_gamble_overall'])
+    except Exception as e:
+        stats['prop_gamble_overall'] = np.nan
+        logging.warning(f"Error calculating prop_gamble_overall: {str(e)}")
     
-    # Per-condition stats
+    try:
+        stats['mean_rt_overall'] = df.loc[valid_rt, 'rt'].mean() if valid_rt.any() else np.nan
+        log_debug('mean_rt_overall', stats['mean_rt_overall'])
+    except Exception as e:
+        stats['mean_rt_overall'] = np.nan
+        logging.warning(f"Error calculating mean_rt_overall: {str(e)}")
+    
+    # Calculate quantiles with safe_quantile which includes logging
+    stats['rt_q10_overall'] = safe_quantile(df.loc[valid_rt, 'rt'].values, 0.1, 'rt_overall')
+    stats['rt_q50_overall'] = safe_quantile(df.loc[valid_rt, 'rt'].values, 0.5, 'rt_overall')
+    stats['rt_q90_overall'] = safe_quantile(df.loc[valid_rt, 'rt'].values, 0.9, 'rt_overall')
+    
+    # Per-condition stats with detailed logging
     for frame in ['gain', 'loss']:
         for cond in ['ntc', 'tc']:
             cond_key = f'{frame.capitalize()}_{cond.upper()}'
-            mask = (df['frame'] == frame) & (df['cond'] == cond)
-            cond_df = df[mask]
             
-            valid_cond_choice = ~cond_df['choice'].isna()
-            valid_cond_rt = ~cond_df['rt'].isna()
-            
-            # Proportion of gamble choices
-            prop_gamble = cond_df.loc[valid_cond_choice, 'choice'].mean() if valid_cond_choice.any() else np.nan
-            stats[f'prop_gamble_{cond_key}'] = prop_gamble
-            
-            # Mean RT
-            mean_rt = cond_df.loc[valid_cond_rt, 'rt'].mean() if valid_cond_rt.any() else np.nan
-            stats[f'mean_rt_{cond_key}'] = mean_rt
+            try:
+                # Create condition mask and filter data
+                mask = (df['frame'] == frame) & (df['cond'] == cond)
+                cond_df = df[mask]
+                n_trials = len(cond_df)
+                
+                log_debug(f'n_trials_{cond_key}', n_trials, 'int')
+                
+                # Handle choice data
+                valid_cond_choice = ~cond_df['choice'].isna()
+                valid_cond_rt = ~cond_df['rt'].isna()
+                cond_rts = cond_df.loc[valid_rt & mask, 'rt'].values  # Use valid_rt from overall
+                
+                # Log basic info about this condition
+                log_debug(f'n_valid_choice_{cond_key}', valid_cond_choice.sum(), 'int')
+                log_debug(f'n_valid_rt_{cond_key}', len(cond_rts), 'int')
+                
+                # Calculate choice statistics with error handling
+                choice_key = f'prop_gamble_{cond_key}'
+                try:
+                    stats[choice_key] = cond_df.loc[valid_cond_choice, 'choice'].mean() if valid_cond_choice.any() else np.nan
+                    log_debug(choice_key, stats[choice_key])
+                except Exception as e:
+                    stats[choice_key] = np.nan
+                    logging.warning(f"Error calculating {choice_key}: {str(e)}")
+                
+                # Calculate RT statistics with error handling
+                rt_mean_key = f'mean_rt_{cond_key}'
+                try:
+                    stats[rt_mean_key] = np.mean(cond_rts) if len(cond_rts) > 0 else np.nan
+                    log_debug(rt_mean_key, stats[rt_mean_key])
+                except Exception as e:
+                    stats[rt_mean_key] = np.nan
+                    logging.warning(f"Error calculating {rt_mean_key}: {str(e)}")
+                
+                # Calculate RT quantiles with safe_quantile
+                stats[f'rt_q10_{cond_key}'] = safe_quantile(cond_rts, 0.1, f'rt_{cond_key}')
+                stats[f'rt_q50_{cond_key}'] = safe_quantile(cond_rts, 0.5, f'rt_{cond_key}')
+                stats[f'rt_q90_{cond_key}'] = safe_quantile(cond_rts, 0.9, f'rt_{cond_key}')
+                
+                # RT histogram bins (5 bins for each condition)
+                hist_key_base = f'rt_hist_bin_{{}}_{cond_key}'
+                if len(cond_rts) > 0:
+                    try:
+                        hist, bin_edges = np.histogram(cond_rts, bins=5, density=True)
+                        for i in range(5):
+                            hist_key = hist_key_base.format(i)
+                            stats[hist_key] = float(hist[i]) if i < len(hist) else np.nan
+                            log_debug(hist_key, stats[hist_key], 'hist_bin')
+                    except Exception as e:
+                        logging.warning(f"Error calculating histogram for {cond_key}: {str(e)}")
+                        for i in range(5):
+                            stats[hist_key_base.format(i)] = np.nan
+                else:
+                    for i in range(5):
+                        stats[hist_key_base.format(i)] = np.nan
+                        
+            except Exception as e:
+                logging.warning(f"Error processing condition {cond_key}: {str(e)}")
+                # Ensure all expected keys are present even if there was an error
+                for stat_type in (['prop_gamble', 'mean_rt', 'rt_q10', 'rt_q50', 'rt_q90'] + 
+                               [f'rt_hist_bin{i}' for i in range(5)]):
+                    stats[f'{stat_type}_{cond_key}'] = np.nan
     
-    # Calculate framing effects
-    if 'prop_gamble_Loss_NTC' in stats and 'prop_gamble_Gain_NTC' in stats:
-        stats['framing_effect_ntc'] = stats['prop_gamble_Loss_NTC'] - stats['prop_gamble_Gain_NTC']
-    else:
+    # Framing effects (choice proportions) with error handling
+    try:
+        stats['framing_effect_ntc'] = stats.get('prop_gamble_Loss_NTC', np.nan) - stats.get('prop_gamble_Gain_NTC', np.nan)
+        stats['framing_effect_tc'] = stats.get('prop_gamble_Loss_TC', np.nan) - stats.get('prop_gamble_Gain_TC', np.nan)
+        log_debug('framing_effect_ntc', stats['framing_effect_ntc'])
+        log_debug('framing_effect_tc', stats['framing_effect_tc'])
+    except Exception as e:
+        logging.warning(f"Error calculating framing effects: {str(e)}")
         stats['framing_effect_ntc'] = np.nan
-        
-    if 'prop_gamble_Loss_TC' in stats and 'prop_gamble_Gain_TC' in stats:
-        stats['framing_effect_tc'] = stats['prop_gamble_Loss_TC'] - stats['prop_gamble_Gain_TC']
-    else:
         stats['framing_effect_tc'] = np.nan
     
-    stats['framing_effect_avg'] = np.nanmean([stats['framing_effect_ntc'], stats['framing_effect_tc']])
+    # RT framing biases with error handling
+    try:
+        stats['rt_framing_bias_ntc'] = stats.get('mean_rt_Loss_NTC', np.nan) - stats.get('mean_rt_Gain_NTC', np.nan)
+        stats['rt_framing_bias_tc'] = stats.get('mean_rt_Loss_TC', np.nan) - stats.get('mean_rt_Gain_TC', np.nan)
+        log_debug('rt_framing_bias_ntc', stats['rt_framing_bias_ntc'])
+        log_debug('rt_framing_bias_tc', stats['rt_framing_bias_tc'])
+    except Exception as e:
+        logging.warning(f"Error calculating RT framing biases: {str(e)}")
+        stats['rt_framing_bias_ntc'] = np.nan
+        stats['rt_framing_bias_tc'] = np.nan
+    
+    # RT standard deviations with error handling
+    try:
+        stats['rt_std_overall'] = df.loc[valid_rt, 'rt'].std() if valid_rt.any() else np.nan
+        log_debug('rt_std_overall', stats['rt_std_overall'])
+        
+        for cond in ['Gain_NTC', 'Gain_TC', 'Loss_NTC', 'Loss_TC']:
+            cond_key = f'rt_std_{cond}'
+            try:
+                cond_mask = ((df['frame'] == cond.split('_')[0].lower()) & 
+                          (df['cond'] == cond.split('_')[1].lower()))
+                cond_rts = df.loc[cond_mask & valid_rt, 'rt'].values
+                stats[cond_key] = np.std(cond_rts) if len(cond_rts) > 1 else np.nan
+                log_debug(cond_key, stats[cond_key])
+            except Exception as e:
+                stats[cond_key] = np.nan
+                logging.warning(f"Error calculating {cond_key}: {str(e)}")
+    except Exception as e:
+        logging.warning(f"Error calculating RT standard deviations: {str(e)}")
+        stats['rt_std_overall'] = np.nan
+        for cond in ['Gain_NTC', 'Gain_TC', 'Loss_NTC', 'Loss_TC']:
+            stats[f'rt_std_{cond}'] = np.nan
+    
+    # Gain vs Loss frame contrasts with error handling
+    try:
+        stats['mean_rt_Gain_vs_Loss_TC'] = stats.get('mean_rt_Gain_TC', np.nan) - stats.get('mean_rt_Loss_TC', np.nan)
+        stats['mean_rt_Gain_vs_Loss_NTC'] = stats.get('mean_rt_Gain_NTC', np.nan) - stats.get('mean_rt_Loss_NTC', np.nan)
+        stats['rt_median_Gain_vs_Loss_TC'] = stats.get('rt_q50_Gain_TC', np.nan) - stats.get('rt_q50_Loss_TC', np.nan)
+        stats['rt_median_Gain_vs_Loss_NTC'] = stats.get('rt_q50_Gain_NTC', np.nan) - stats.get('rt_q50_Loss_NTC', np.nan)
+        stats['framing_effect_rt_gain'] = stats.get('mean_rt_Gain_TC', np.nan) - stats.get('mean_rt_Gain_NTC', np.nan)
+        stats['framing_effect_rt_loss'] = stats.get('mean_rt_Loss_TC', np.nan) - stats.get('mean_rt_Loss_NTC', np.nan)
+        
+        # Log all contrast values
+        for key in ['mean_rt_Gain_vs_Loss_TC', 'mean_rt_Gain_vs_Loss_NTC',
+                   'rt_median_Gain_vs_Loss_TC', 'rt_median_Gain_vs_Loss_NTC',
+                   'framing_effect_rt_gain', 'framing_effect_rt_loss']:
+            log_debug(key, stats[key])
+    except Exception as e:
+        logging.warning(f"Error calculating gain/loss contrasts: {str(e)}")
+        for key in ['mean_rt_Gain_vs_Loss_TC', 'mean_rt_Gain_vs_Loss_NTC',
+                   'rt_median_Gain_vs_Loss_TC', 'rt_median_Gain_vs_Loss_NTC',
+                   'framing_effect_rt_gain', 'framing_effect_rt_loss']:
+            stats[key] = np.nan
     
     return stats
 

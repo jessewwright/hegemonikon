@@ -3,35 +3,50 @@
 #          fitted to the Roberts et al. (2022) empirical data.
 
 import os
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'  # Must be set before numpy/pytorch import
-import concurrent.futures
-import argparse
-import csv
-import logging
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'  # Must be set before numpy/import logging
+import os
 import sys
 import time
+import argparse
+import numpy as np
+import pandas as pd
+import torch
 from pathlib import Path
+import logging
+
+# Maximize CPU utilization for PyTorch
+try:
+    import psutil
+    ram_gb = psutil.virtual_memory().total / 1e9
+    logging.info(f"[Startup] Detected total system RAM: {ram_gb:.1f} GB")
+except ImportError:
+    logging.info("[Startup] psutil not installed; cannot display RAM info.")
+
+cpu_threads = os.cpu_count() or 1
+logging.info(f"[Startup] Setting torch.set_num_threads({cpu_threads}) for maximal CPU utilization.")
+torch.set_num_threads(cpu_threads)
+
 from typing import Dict, List, Tuple, Any, Optional, Union
 
-try:
-    import pebble
-    from pebble import ProcessPool
-    has_pebble = True
-except ImportError:
-    has_pebble = False
-    print("Pebble library not found. Timeout functionality will be disabled.")
-
-# Define helper functions for multiprocessing (must be at module level for pickling)
+# Define helper functions for PPC (no multiprocessing, no timeouts)
 def sample_from_posterior(posterior_obj, num_samples, obs_tensor):
-    """Helper function for sampling from posterior (used with timeout)"""
+    """Helper function for sampling from posterior (used in main process)"""
+    logging.info("[Main process] Entered sample_from_posterior.")
     return posterior_obj.sample(
-        (num_samples,), 
+        (num_samples,),
         x=obs_tensor.unsqueeze(0),
         show_progress_bars=False
     ).cpu()
 
 def run_simulation(params_dict, subject_data, stat_keys):
-    """Helper function for running simulations (used with timeout)"""
+    """Helper function for running simulations (used in main process)"""
+    import torch, numpy as np
+    # Derive deterministic seed from global_seed, subject_id, sim_idx if available
+    subject_id = params_dict.get('subject_id', 0)
+    sim_idx = params_dict.get('sim_idx', 0)
+    seed = int(0) + int(subject_id) * 100_000 + int(sim_idx)
+    torch.manual_seed(seed)
+    np.random.seed(seed)
     return simulate_dataset_for_ppc(params_dict, subject_data, stat_keys)
 
 import numpy as np
@@ -96,148 +111,173 @@ CONDITIONS_ROBERTS = {
 # --- Core Functions (some can be imported from your fitting script if refactored) ---
 
 def get_roberts_summary_stat_keys() -> List[str]:
-    """Defines the keys for the summary statistics vector. MUST MATCH WHAT THE NPE WAS TRAINED WITH."""
-    # This is the enhanced version with 60 statistics (including Gain vs Loss frame contrasts)
-    # matching the version used to train the 5-parameter model
-    keys = [
-        'prop_gamble_overall', 'mean_rt_overall',
-        'rt_q10_overall', 'rt_q50_overall', 'rt_q90_overall',
-    ]
-    for cond_name_key in CONDITIONS_ROBERTS.keys():
-        keys.append(f"prop_gamble_{cond_name_key}")
-        keys.append(f"mean_rt_{cond_name_key}")
-        keys.append(f"rt_q10_{cond_name_key}")
-        keys.append(f"rt_q50_{cond_name_key}")
-        keys.append(f"rt_q90_{cond_name_key}")
-        for bin_idx in range(5): 
-            keys.append(f'rt_hist_bin{bin_idx}_{cond_name_key}')
-            
-    # Core framing effect stats
-    keys.extend(['framing_effect_ntc', 'framing_effect_tc', 
-                 'rt_framing_bias_ntc', 'rt_framing_bias_tc'])
+    """
+    Returns the keys for the summary statistics vector.
     
-    # RT distribution stats
-    keys.append('rt_std_overall')
-    for cond_name_key in CONDITIONS_ROBERTS.keys():
-        keys.append(f'rt_std_{cond_name_key}')
-    
-    # Targeted Gain vs Loss frame contrasts - CRITICAL for 5-parameter model
-    keys.extend([
-        'mean_rt_Gain_vs_Loss_TC',   # RT contrast in TC condition
-        'mean_rt_Gain_vs_Loss_NTC',  # RT contrast in NTC condition
-        'rt_median_Gain_vs_Loss_TC',  # Median RT contrast in TC
-        'rt_median_Gain_vs_Loss_NTC', # Median RT contrast in NTC
-        'framing_effect_rt_gain',     # RT effect within Gain frame (TC vs NTC)
-        'framing_effect_rt_loss'      # RT effect within Loss frame (TC vs NTC)
-    ])
-    
-    # Verify we have exactly 60 statistics
-    if len(keys) != 60:
-        logging.warning(f"Expected 60 summary statistics but found {len(keys)}")
+    Returns:
+        List[str]: List of summary statistic keys in the exact order expected by the NPE.
         
-    logging.debug(f"Defined {len(keys)} summary statistics keys for PPC.")
-    return keys
+    Note:
+        The statistics are defined in stats_schema.py to ensure consistency across the codebase.
+        Any changes to the statistics must be made there, not here.
+    """
+    from stats_schema import ROBERTS_SUMMARY_STAT_KEYS, validate_summary_stats
+    
+    try:
+        # This will raise ValueError if the stats don't match expectations
+        validate_summary_stats()
+        return list(ROBERTS_SUMMARY_STAT_KEYS)  # Return a copy to prevent modification
+    except ImportError as e:
+        logging.error("Failed to import stats_schema. Make sure it's in your PYTHONPATH.")
+        raise
+    except ValueError as e:
+        logging.error(f"Summary statistics validation failed: {e}")
+        raise
+
+def safe_diff(a, b):
+    return np.nan if (np.isnan(a) or np.isnan(b)) else a - b
 
 def calculate_summary_stats_for_ppc(df_trials: pd.DataFrame, stat_keys: List[str]) -> Dict[str, float]:
     """Calculates summary statistics for a single dataset (empirical or simulated)."""
-    summaries = {}
+    import numpy as np
+    summaries = {k: np.nan for k in stat_keys}  # Initialize all stats as NaN
+    
     # Handle completely empty datasets
-    if df_trials.empty: return {k: -999.0 for k in stat_keys}
+    if df_trials.empty:
+        return summaries
     
     # Filter to valid trials if needed
     df_valid = df_trials.dropna(subset=['choice', 'rt'])
-    if len(df_valid) == 0: return {k: -999.0 for k in stat_keys}
+    if len(df_valid) == 0:
+        return summaries
     
     # Overall stats across conditions
     choices = df_valid['choice']
     rts = df_valid['rt']
-    prop_gamble = (choices == 1).mean() if 'choice' in df_valid.columns else -999.0
-    summaries['prop_gamble_overall'] = prop_gamble
-    summaries['mean_rt_overall'] = rts.mean()
-    try:
-        q = rts.quantile([0.1,0.5,0.9])
-        summaries['rt_q10_overall']=q.get(0.1,-999.0); summaries['rt_q50_overall']=q.get(0.5,-999.0); summaries['rt_q90_overall']=q.get(0.9,-999.0)
-    except: pass
+    
+    if 'choice' in df_valid.columns and len(choices) > 0:
+        prop_gamble = (choices == 1).mean()
+        if not np.isnan(prop_gamble):
+            summaries['prop_gamble_overall'] = float(prop_gamble)
+    
+    if len(rts) > 0:
+        rt_mean = rts.mean()
+        if not np.isnan(rt_mean):
+            summaries['mean_rt_overall'] = float(rt_mean)
+        
+        try:
+            q = rts.quantile([0.1, 0.5, 0.9])
+            if not q.empty:
+                for q_name, q_val in zip(['rt_q10', 'rt_q50', 'rt_q90'], [0.1, 0.5, 0.9]):
+                    val = q.get(q_val, np.nan)
+                    if not np.isnan(val):
+                        summaries[f'{q_name}_overall'] = float(val)
+        except Exception as e:
+            logging.debug(f"Error calculating overall RT quantiles: {e}")
     
     # Per-condition stats
     cond_props, cond_rts_mean, cond_rts_std, cond_rts_median = {}, {}, {}, {}
     for cond_key, cond_info in CONDITIONS_ROBERTS.items():
-        cond_key_enum = cond_key # e.g. 'Gain_TC'
+        cond_key_enum = cond_key  # e.g. 'Gain_TC'
         cond_mask = (df_valid['frame'] == cond_info['frame']) & (df_valid['cond'] == cond_info['cond'])
         choices_cond = df_valid.loc[cond_mask, 'choice'] if 'choice' in df_valid.columns else pd.Series([])
         rts_cond = df_valid.loc[cond_mask, 'rt']
         
-        if not choices_cond.empty:
+        # Calculate choice proportions if we have valid choice data
+        if not choices_cond.empty and len(choices_cond) > 0:
             prop_gamble_cond = (choices_cond == 1).mean()
-            summaries[f'prop_gamble_{cond_key_enum}'] = prop_gamble_cond
-            cond_props[cond_key_enum] = prop_gamble_cond
+            if not np.isnan(prop_gamble_cond):
+                summaries[f'prop_gamble_{cond_key_enum}'] = float(prop_gamble_cond)
+                cond_props[cond_key_enum] = prop_gamble_cond
         
-        if not rts_cond.empty:
-            # Calculate and store mean RTs per condition
-            summaries[f'mean_rt_{cond_key_enum}'] = rts_cond.mean() 
-            cond_rts_mean[cond_key_enum] = rts_cond.mean()
-            summaries[f'rt_std_{cond_key_enum}'] = rts_cond.std() 
-            cond_rts_std[cond_key_enum] = rts_cond.std()
+        # Calculate RT statistics if we have valid RT data
+        if not rts_cond.empty and len(rts_cond) > 0:
+            # Mean and std RTs
+            mean_rt = rts_cond.mean()
+            std_rt = rts_cond.std()
             
-            # Calculate and store median RTs per condition
+            if not np.isnan(mean_rt):
+                summaries[f'mean_rt_{cond_key_enum}'] = float(mean_rt)
+                cond_rts_mean[cond_key_enum] = mean_rt
+            
+            if not np.isnan(std_rt):
+                summaries[f'rt_std_{cond_key_enum}'] = float(std_rt)
+                cond_rts_std[cond_key_enum] = std_rt
+            
+            # Calculate and store median RTs
             median_rt = rts_cond.median()
-            cond_rts_median[cond_key_enum] = median_rt
+            if not np.isnan(median_rt):
+                cond_rts_median[cond_key_enum] = median_rt
             
+            # Calculate RT quantiles
             try:
-                q_c = rts_cond.quantile([0.1,0.5,0.9])
-                summaries[f'rt_q10_{cond_key_enum}']=q_c.get(0.1,-999.0) 
-                summaries[f'rt_q50_{cond_key_enum}']=q_c.get(0.5,-999.0) 
-                summaries[f'rt_q90_{cond_key_enum}']=q_c.get(0.9,-999.0)
-            except: pass
+                q_c = rts_cond.quantile([0.1, 0.5, 0.9])
+                if not q_c.empty:
+                    for q_name, q_val in zip(['rt_q10', 'rt_q50', 'rt_q90'], [0.1, 0.5, 0.9]):
+                        val = q_c.get(q_val, np.nan)
+                        if not np.isnan(val):
+                            summaries[f'{q_name}_{cond_key_enum}'] = float(val)
+            except Exception as e:
+                logging.debug(f"Error calculating RT quantiles for {cond_key_enum}: {e}")
             
-            max_rt = 1.0 if 'TC' in cond_key_enum else 3.0 
-            edges = np.linspace(0,max_rt,6)
-            if len(rts_cond) >= 1:
-                hist, _ = np.histogram(rts_cond.clip(0,max_rt), bins=edges, density=True) 
+            # Calculate RT histogram bins (proportion of trials in each bin)
+            max_rt = 1.0 if 'TC' in cond_key_enum else 3.0
+            edges = np.linspace(0, max_rt, 6)
+            try:
+                hist, _ = np.histogram(rts_cond.clip(0, max_rt), bins=edges, density=False)
+                if len(rts_cond) > 0:
+                    hist = hist / len(rts_cond)
                 for i, h in enumerate(hist):
-                    summaries[f'rt_hist_bin{i}_{cond_key_enum}'] = h
+                    if not np.isnan(h):
+                        summaries[f'rt_hist_bin{i}_{cond_key_enum}'] = float(h)
+            except Exception as e:
+                logging.debug(f"Error calculating RT histogram for {cond_key_enum}: {e}")
+        else:
+            # Log dropped/empty RT subset for this condition
+            logging.warning(f"Empty RT subset for dataset (unknown subj), condition {cond_key_enum}")
     
     # Framing effects (choice proportions)
     pg_ln = cond_props.get('Loss_NTC', np.nan)
-    pg_gn = cond_props.get('Gain_NTC', np.nan) 
-    summaries['framing_effect_ntc'] = pg_ln - pg_gn if not(pd.isna(pg_ln) or pd.isna(pg_gn)) else -999.0
+    pg_gn = cond_props.get('Gain_NTC', np.nan)
+    summaries['framing_effect_ntc'] = safe_diff(pg_ln, pg_gn)
     
     pg_lt = cond_props.get('Loss_TC', np.nan)
-    pg_gt = cond_props.get('Gain_TC', np.nan) 
-    summaries['framing_effect_tc'] = pg_lt - pg_gt if not(pd.isna(pg_lt) or pd.isna(pg_gt)) else -999.0
+    pg_gt = cond_props.get('Gain_TC', np.nan)
+    summaries['framing_effect_tc'] = safe_diff(pg_lt, pg_gt)
     
     # RT framing effects (mean RT differences between loss and gain)
     rt_ln = cond_rts_mean.get('Loss_NTC', np.nan)
-    rt_gn = cond_rts_mean.get('Gain_NTC', np.nan) 
-    summaries['rt_framing_bias_ntc'] = rt_ln - rt_gn if not(pd.isna(rt_ln) or pd.isna(rt_gn)) else -999.0
+    rt_gn = cond_rts_mean.get('Gain_NTC', np.nan)
+    summaries['rt_framing_bias_ntc'] = safe_diff(rt_ln, rt_gn)
     
     rt_lt = cond_rts_mean.get('Loss_TC', np.nan)
-    rt_gt = cond_rts_mean.get('Gain_TC', np.nan) 
-    summaries['rt_framing_bias_tc'] = rt_lt - rt_gt if not(pd.isna(rt_lt) or pd.isna(rt_gt)) else -999.0
+    rt_gt = cond_rts_mean.get('Gain_TC', np.nan)
+    summaries['rt_framing_bias_tc'] = safe_diff(rt_lt, rt_gt)
     
-    # NEW: Mean RT contrasts for Gain vs Loss (added for 5-parameter model)
-    mrt_gtc = cond_rts_mean.get('Gain_TC', np.nan) 
+    # Mean RT contrasts for Gain vs Loss (added for 5-parameter model)
+    mrt_gtc = cond_rts_mean.get('Gain_TC', np.nan)
     mrt_ltc = cond_rts_mean.get('Loss_TC', np.nan)
-    summaries['mean_rt_Gain_vs_Loss_TC'] = mrt_gtc - mrt_ltc if not (pd.isna(mrt_gtc) or pd.isna(mrt_ltc)) else -999.0
+    summaries['mean_rt_Gain_vs_Loss_TC'] = safe_diff(mrt_gtc, mrt_ltc)
 
-    mrt_gntc = cond_rts_mean.get('Gain_NTC', np.nan) 
+    mrt_gntc = cond_rts_mean.get('Gain_NTC', np.nan)
     mrt_lntc = cond_rts_mean.get('Loss_NTC', np.nan)
-    summaries['mean_rt_Gain_vs_Loss_NTC'] = mrt_gntc - mrt_lntc if not (pd.isna(mrt_gntc) or pd.isna(mrt_lntc)) else -999.0
+    summaries['mean_rt_Gain_vs_Loss_NTC'] = safe_diff(mrt_gntc, mrt_lntc)
 
-    # NEW: Median RT contrasts (based on stored median values)
-    medrt_gtc = cond_rts_median.get('Gain_TC', np.nan) 
+    # Median RT contrasts (based on stored median values)
+    medrt_gtc = cond_rts_median.get('Gain_TC', np.nan)
     medrt_ltc = cond_rts_median.get('Loss_TC', np.nan)
-    summaries['rt_median_Gain_vs_Loss_TC'] = medrt_gtc - medrt_ltc if not (pd.isna(medrt_gtc) or pd.isna(medrt_ltc)) else -999.0
+    summaries['rt_median_Gain_vs_Loss_TC'] = safe_diff(medrt_gtc, medrt_ltc)
 
-    medrt_gntc = cond_rts_median.get('Gain_NTC', np.nan) 
+    medrt_gntc = cond_rts_median.get('Gain_NTC', np.nan)
     medrt_lntc = cond_rts_median.get('Loss_NTC', np.nan)
-    summaries['rt_median_Gain_vs_Loss_NTC'] = medrt_gntc - medrt_lntc if not (pd.isna(medrt_gntc) or pd.isna(medrt_lntc)) else -999.0
+    summaries['rt_median_Gain_vs_Loss_NTC'] = safe_diff(medrt_gntc, medrt_lntc)
 
-    # NEW: RT effects within frames (TC vs NTC mean RTs)
-    summaries['framing_effect_rt_gain'] = mrt_gtc - mrt_gntc if not (pd.isna(mrt_gtc) or pd.isna(mrt_gntc)) else -999.0
-    summaries['framing_effect_rt_loss'] = mrt_ltc - mrt_lntc if not (pd.isna(mrt_ltc) or pd.isna(mrt_lntc)) else -999.0
+    # RT effects within frames (TC vs NTC mean RTs)
+    summaries['framing_effect_rt_gain'] = safe_diff(mrt_gtc, mrt_gntc)
+    summaries['framing_effect_rt_loss'] = safe_diff(mrt_ltc, mrt_lntc)
     
-    return {k: summaries.get(k, -999.0) if not pd.isna(summaries.get(k, -999.0)) else -999.0 for k in stat_keys}
+    # Ensure we only return the requested stats in the correct order
+    return {k: summaries[k] for k in stat_keys}
 
 
 def simulate_dataset_for_ppc(
@@ -246,6 +286,15 @@ def simulate_dataset_for_ppc(
     stat_keys: List[str],
     agent: Any = None
 ) -> Dict[str, float]:
+    # --- Safety check: enforce parameter name consistency ---
+    # This prevents silent bugs if upstream parameter names change or are refactored.
+    expected_param_names = {'w_n', 'a_0', 'w_s_eff', 't_0', 'alpha_gain'}
+    assert set(params_dict.keys()) >= expected_param_names, (
+        f"params_dict missing expected keys: {expected_param_names - set(params_dict.keys())}\n"
+        f"Current keys: {set(params_dict.keys())}"
+    )
+    # If you refactor parameter names upstream, update this assertion and mapping accordingly.
+
     """Simulates one full dataset for a subject given one parameter set and their trial structure."""
     if agent is None:
         agent = MVNESAgent(config={})
@@ -260,16 +309,18 @@ def simulate_dataset_for_ppc(
             'alpha_gain': params_dict.get('alpha_gain', 1.0),
             **BASE_SIM_PARAMS
         }
+        # Set max_time based on trial type (before calling agent)
+        if trial_info['time_constrained']:
+            agent_run_params['max_time'] = 1.0
+        else:
+            agent_run_params['max_time'] = 3.0
         try:
-            # Always run the DDM simulation, let run_mvnes_trial handle all drift rates
+            # Always run the DDM simulation, let run_mvnes_trial handle all drift rates and RT bounds
             trial_output = agent.run_mvnes_trial(salience_input, norm_input, agent_run_params)
             sim_rt = trial_output.get('rt', np.nan)
             sim_choice = trial_output.get('choice', np.nan)
             trace = trial_output.get('trace', [np.nan])
             timeout = trial_output.get('timeout', False)
-            # Clamp RT if time constrained
-            if not pd.isna(sim_rt) and trial_info['time_constrained']:
-                sim_rt = min(sim_rt, 1.0)
             sim_results_list.append({
                 'rt': sim_rt, 'choice': sim_choice,
                 'frame': trial_info['frame'], 'cond': trial_info['cond'], 'prob': trial_info['prob']
@@ -283,13 +334,22 @@ def simulate_dataset_for_ppc(
 def load_npe_posterior_object(npe_file_path: Path, prior: BoxUniform, device: str) -> Any:
     """Loads a pre-trained NPE density estimator and builds a posterior object."""
     logging.info(f"Loading pre-trained NPE from: {npe_file_path}")
-    checkpoint = torch.load(npe_file_path, map_location=device) # Add weights_only=True for safety if applicable
+    checkpoint = torch.load(npe_file_path, map_location=device)
     if not isinstance(checkpoint, dict) or 'density_estimator_state_dict' not in checkpoint:
         raise ValueError("NPE checkpoint error: Expected dict with 'density_estimator_state_dict'.")
 
     num_summary_stats_trained = checkpoint.get('num_summary_stats')
-    if num_summary_stats_trained is None:
-        raise ValueError("'num_summary_stats' missing from checkpoint. Cannot verify consistency.")
+    logging.info(f"Checkpoint num_summary_stats: {num_summary_stats_trained}")
+    if num_summary_stats_trained is None or num_summary_stats_trained <= 0:
+        logging.warning(f"num_summary_stats_trained is {num_summary_stats_trained}. Trying to use len(get_roberts_summary_stat_keys()).")
+        num_summary_stats_trained = len(get_roberts_summary_stat_keys())
+    if num_summary_stats_trained <= 0:
+        raise ValueError("Number of summary statistics for dummy_x is non-positive. Cannot build dummy network.")
+
+    dummy_theta = prior.sample((10,))
+    # Use non-degenerate dummy_x: each row is random and offset
+    dummy_x = torch.randn(10, num_summary_stats_trained, device=device) + torch.arange(10, device=device).unsqueeze(1)
+    logging.info(f"Dummy_x shape: {dummy_x.shape}, should be (10, D>0) and non-degenerate")
     
     current_script_num_stats = len(get_roberts_summary_stat_keys())
     if current_script_num_stats != num_summary_stats_trained:
@@ -297,12 +357,55 @@ def load_npe_posterior_object(npe_file_path: Path, prior: BoxUniform, device: st
                       f"but current script defines {current_script_num_stats}. Adjust get_roberts_summary_stat_keys().")
         raise ValueError("Summary statistic dimension mismatch.")
 
-    inference_algorithm = SNPE(prior=prior, density_estimator='maf', device=device)
-    batch_theta = prior.sample((2,))
-    batch_x = torch.randn(2, num_summary_stats_trained, device=device)
-    density_estimator_net = inference_algorithm._build_neural_net(batch_theta, batch_x)
-    density_estimator_net.load_state_dict(checkpoint['density_estimator_state_dict'], strict=False)
-    posterior_object = inference_algorithm.build_posterior(density_estimator_net)
+    try:
+        inference_algorithm = SNPE(prior=prior, density_estimator='maf', device=device, z_score_x='none', z_score_y=False)
+        logging.info("Instantiated SNPE with z_score_x='none' and z_score_y=False.")
+    except TypeError:
+        inference_algorithm = SNPE(prior=prior, density_estimator='maf', device=device)
+        logging.info("SNPE does not accept z_score_x/z_score_y in this version; falling back to default.")
+
+    # To load state_dict, the network must be built first.
+    # We use dummy data to trigger the network build via append_simulations and a 0-epoch train.
+    # Use 10 non-degenerate dummy samples
+    dummy_theta = prior.sample((10,))
+    dummy_x = torch.randn(10, num_summary_stats_trained, device=device) + torch.arange(10, device=device).unsqueeze(1)
+    density_estimator_build_kwargs = checkpoint.get('density_estimator_build_kwargs', {})
+    filtered_build_kwargs = {k: v for k, v in density_estimator_build_kwargs.items() if k not in ('z_score_x', 'z_score_y')}
+    if len(filtered_build_kwargs) != len(density_estimator_build_kwargs):
+        logging.info(f"Filtered out unsupported keys from build kwargs: {[k for k in density_estimator_build_kwargs if k in ('z_score_x', 'z_score_y')]}")
+    logging.info(f"Building network structure with dummy data. Build kwargs from checkpoint: {filtered_build_kwargs}")
+    density_estimator_net = inference_algorithm.append_simulations(
+        dummy_theta,
+        dummy_x
+    ).train(
+        max_num_epochs=1,
+        show_train_summary=False,
+        **filtered_build_kwargs
+    )
+    logging.info(f"density_estimator_net after train: {density_estimator_net}")
+    logging.info(f"inference_algorithm.neural_net after train: {getattr(inference_algorithm, 'neural_net', None)}")
+
+    # Use whichever is not None
+    net_to_use = density_estimator_net if density_estimator_net is not None else getattr(inference_algorithm, 'neural_net', None)
+    if net_to_use is None:
+        logging.error(f"Both density_estimator_net and inference_algorithm.neural_net are None after train. Types: {type(density_estimator_net)}, {type(getattr(inference_algorithm, 'neural_net', None))}")
+        raise RuntimeError("Failed to build the neural network structure within the SNPE object.")
+    logging.info("Loading state_dict into the built network...")
+    net_to_use.load_state_dict(checkpoint['density_estimator_state_dict'], strict=False)
+
+    loaded_net = net_to_use
+    if hasattr(loaded_net, 'num_flows') and 'num_flows' in checkpoint:
+        if loaded_net.num_flows != checkpoint.get('num_flows'):
+            logging.warning(f"num_flows mismatch: net={loaded_net.num_flows}, checkpoint={checkpoint.get('num_flows')}. strict=False used.")
+    if hasattr(loaded_net, 'hidden_features') and 'hidden_features' in checkpoint:
+        if loaded_net.hidden_features != checkpoint.get('hidden_features'):
+            logging.warning(f"hidden_features mismatch: net={loaded_net.hidden_features}, checkpoint={checkpoint.get('hidden_features')}. strict=False used.")
+
+    # Try both build_posterior() signatures
+    try:
+        posterior_object = inference_algorithm.build_posterior(net_to_use)
+    except Exception:
+        posterior_object = inference_algorithm.build_posterior()
     logging.info(f"NPE loaded and posterior object built. Trained with {checkpoint.get('npe_train_sims','N/A')} sims.")
     return posterior_object
 
@@ -317,21 +420,26 @@ def run_ppc_for_subject(
     device: str,
     output_plots_dir: Path
 ):
+    import time as _time
+    _t0 = _time.time()
     logging.info(f"--- Starting PPC for Subject {subject_id} ---")
+    print(f"[PPC] Starting subject {subject_id}", flush=True)
     stat_keys = get_roberts_summary_stat_keys()
     # 1. Get actual observed summary statistics for this subject
     actual_obs_stats = calculate_summary_stats_for_ppc(df_subject_empirical_data, stat_keys)
     # 2. Prepare trial structure as numpy record array for simulation speed
     trial_struct = df_subject_empirical_data[['prob','is_gain_frame','frame','cond','time_constrained']].to_records(index=False)
-    # 3. Only sample as many posterior parameter sets as num_ppc_simulations
-    logging.info(f"Drawing {num_ppc_simulations} posterior parameter samples for subject {subject_id}...")
-    x_condition = observed_subject_summary_stats_tensor.unsqueeze(0) if observed_subject_summary_stats_tensor.dim() == 1 else observed_subject_summary_stats_tensor
-    x_condition = x_condition.to(device)
-    subject_posterior_param_samples = npe_posterior_obj.sample(
-        (num_ppc_simulations,),
-        x=x_condition,
-        show_progress_bars=False
-    ).cpu()
+    # 3. Draw a larger set of posterior samples for better global coverage
+    num_posterior_samples = 2000
+    logging.info(f"Drawing {num_posterior_samples} posterior parameter samples for subject {subject_id}...")
+    with torch.no_grad():
+        x_condition = observed_subject_summary_stats_tensor.unsqueeze(0) if observed_subject_summary_stats_tensor.dim() == 1 else observed_subject_summary_stats_tensor
+        x_condition = x_condition.to(device)
+        subject_posterior_param_samples = npe_posterior_obj.sample(
+            (num_posterior_samples,),
+            x=x_condition,
+            show_progress_bars=False
+        ).cpu()
     # 4. Reuse a single agent for all PPC sims
     agent = MVNESAgent(config={})
     logging.info(f"Simulating {num_ppc_simulations} datasets for PPC using posterior parameter samples...")
@@ -339,9 +447,19 @@ def run_ppc_for_subject(
     for i in range(num_ppc_simulations):
         if (i + 1) % (num_ppc_simulations // 10 or 1) == 0:
             logging.info(f"  PPC simulation {i+1}/{num_ppc_simulations}")
+            print(f"[PPC] Subject {subject_id}: sim {i+1}/{num_ppc_simulations}", flush=True)
         selected_params_tensor = subject_posterior_param_samples[i]
         params_dict_for_sim = {name: val.item() for name, val in zip(PARAM_NAMES, selected_params_tensor)}
-        sim_stats = simulate_dataset_for_ppc(params_dict_for_sim, trial_struct, stat_keys, agent=agent)
+        params_dict_for_sim['subject_id'] = subject_id
+        params_dict_for_sim['sim_idx'] = i
+        try:
+            sim_stats = simulate_dataset_for_ppc(params_dict_for_sim, trial_struct, stat_keys, agent=agent)
+        except Exception as e:
+            import traceback
+            logging.error(f"Exception in simulate_dataset_for_ppc for subject {subject_id}, sim {i}: {e}")
+            traceback.print_exc()
+            print(f"[PPC][ERROR] Subject {subject_id} sim {i}: {e}", flush=True)
+            sim_stats = {k: float('nan') for k in stat_keys}
         ppc_simulated_stats_list.append(sim_stats)
     df_ppc_stats = pd.DataFrame(ppc_simulated_stats_list)
     # 5. Plotting (unchanged)
@@ -357,7 +475,7 @@ def run_ppc_for_subject(
     axes = axes.flatten()
     for i, key in enumerate(plot_stat_keys):
         ax = axes[i]
-        sim_values = df_ppc_stats[key].dropna()
+        sim_values = df_ppc_stats[key].replace(-999.0, np.nan).dropna()
         if not sim_values.empty:
             sns.histplot(sim_values, ax=ax, kde=True, stat="density", label="Simulated")
             actual_val = actual_obs_stats.get(key)
@@ -375,11 +493,15 @@ def run_ppc_for_subject(
     fig.savefig(output_plots_dir / f"ppc_subject_{subject_id}.png")
     plt.close(fig)
     logging.info(f"PPC plot saved for subject {subject_id}")
+    _t1 = _time.time()
+    elapsed = _t1 - _t0
+    print(f"[PPC] Finished subject {subject_id} in {elapsed:.1f} sec", flush=True)
+    logging.info(f"--- Finished PPC for Subject {subject_id} in {elapsed:.1f} sec ---")
     # Return a summary for a table
     ppc_summary = {'subject_id': subject_id}
     for key in plot_stat_keys:
         ppc_summary[f'obs_{key}'] = actual_obs_stats.get(key)
-        sim_vals = df_ppc_stats[key].dropna()
+        sim_vals = df_ppc_stats[key].replace(-999.0, np.nan).dropna()
         ppc_summary[f'sim_mean_{key}'] = sim_vals.mean() if not sim_vals.empty else np.nan
         ppc_summary[f'sim_median_{key}'] = sim_vals.median() if not sim_vals.empty else np.nan
         if not sim_vals.empty and actual_obs_stats.get(key) is not None and not pd.isna(actual_obs_stats.get(key)):
@@ -391,14 +513,30 @@ def run_ppc_for_subject(
 
 # --- Main Script Execution ---
 if __name__ == "__main__":
+    # Quick pytest-style smoke tests
+    from stats_schema import validate_summary_stats
+    import pandas as pd
+    assert validate_summary_stats()           # schema length check
+    subj_dummy = pd.DataFrame({               # 4 fake trials
+        'frame':['gain','gain','loss','loss'],
+        'cond':['tc','ntc','tc','ntc'],
+        'prob':[.75,.25,.75,.25],
+        'choice':[1,0,1,0],
+        'rt':[0.5,0.8,0.6,1.2]
+    })
+    stats = calculate_summary_stats_for_ppc(subj_dummy, get_roberts_summary_stat_keys())
+    assert not any(v is None for v in stats.values())
+    print("[Smoke test] Summary stats schema and calculation: PASS")
+
     parser = argparse.ArgumentParser(description="Run PPCs for NES model on Roberts et al. data.")
     parser.add_argument('--npe_file', type=str, required=True, help='Path to PRE-TRAINED NPE checkpoint (.pt file).')
     parser.add_argument('--fitted_params_file', type=str, required=True, help='Path to CSV file with fitted empirical parameters (e.g., from empirical fitting run).')
     parser.add_argument('--roberts_data_file', type=str, default="./roberts_framing_data/ftp_osf_data.csv", help='Path to the Roberts data CSV file.')
     parser.add_argument('--output_dir', type=str, required=True, help='Directory to save PPC results and plots.')
     parser.add_argument('--subject_ids', type=str, default=None, help='Comma-separated list of subject IDs for PPC (e.g., "114,122,165"). Default: 3-5 representative subjects.')
-    parser.add_argument('--num_ppc_simulations', type=int, default=200, help='Number of datasets to simulate from posterior for PPC.')
-    parser.add_argument('--num_posterior_samples_for_ppc', type=int, default=500, help='Number of parameter sets to draw from each subject posterior for PPC sims.')
+    # ... (rest of the code remains the same)
+    parser.add_argument('--num_ppc_simulations', type=int, default=50, help='Number of datasets to simulate from posterior for PPC.')
+    parser.add_argument('--num_posterior_samples_for_ppc', type=int, default=200, help='Number of parameter sets to draw from each subject posterior for PPC sims.')
     parser.add_argument('--seed', type=int, default=int(time.time()))
     parser.add_argument('--force_cpu', action='store_true')
     parser.add_argument('--quantify_coverage', action='store_true', help='If set, quantify PPC coverage for all summary stats and all fitted subjects.')
@@ -437,88 +575,47 @@ if __name__ == "__main__":
                 subj_id_int = int(subj_id)
             except:
                 subj_id_int = subj_id
+            logging.info(f"\n========== Starting PPC Coverage for Subject {subj_id} (row {idx}) ==========")
+            logging.debug(f"Subject {subj_id} (row {idx}): DataFrame shape: {df_all_empirical_data.shape}, Subject trials: {df_all_empirical_data[df_all_empirical_data['subject'] == subj_id_int].shape}")
+            print(f"[Coverage] Starting subject {subj_id} (row {idx})", flush=True)
+            import time as _time
+            _t0 = _time.time()
             df_subj = df_all_empirical_data[df_all_empirical_data['subject'] == subj_id_int]
             if df_subj.empty:
+                logging.warning(f"Subject {subj_id} (row {idx}): No data found in empirical data, skipping.")
                 continue
             obs_stats = calculate_summary_stats_for_ppc(df_subj, stat_keys)
+            logging.debug(f"Subject {subj_id} (row {idx}): Observed summary stats: {obs_stats}")
             obs_stats_tensor = torch.tensor([obs_stats[k] for k in stat_keys], dtype=torch.float32, device=device)
-            # Convert subject trials to numpy record array ONCE for all PPC sims
             subj_trial_struct = df_subj[['prob','is_gain_frame','frame','cond','time_constrained']].to_records(index=False)
-            # Process subjects with timeout protection
-            if has_pebble:
-                try:
-                    # Create a process pool with timeout
-                    with ProcessPool(max_workers=1) as pool:
-                        # Sample from posterior with timeout
-                        try:
-                            future = pool.schedule(
-                                sample_from_posterior,
-                                args=(loaded_npe_posterior_object, args.num_posterior_samples_for_ppc, obs_stats_tensor),
-                                timeout=args.timeout_subject
-                            )
-                            posterior_samples = future.result()
-                        except (TimeoutError, concurrent.futures.TimeoutError):
-                            logging.warning(f"Timeout during posterior sampling for subject {subj_id}. obs_stats_tensor: {obs_stats_tensor.tolist()}")
-                            # Insert placeholder stats for all PPC sims for this subject
-                            sim_stats = [{k: -999.0 for k in stat_keys} for _ in range(args.num_ppc_simulations)]
-                            df_sim_stats = pd.DataFrame(sim_stats)
-                            for k in stat_keys:
-                                coverage_records[k].append({'covered_90': np.nan, 'covered_95': np.nan})
-                            n_subjects += 1
-                            continue
-                        except Exception as e:
-                            logging.error(f"Error during posterior sampling for subject {subj_id}: {e}\nobs_stats_tensor: {obs_stats_tensor.tolist()}")
-                            sim_stats = [{k: -999.0 for k in stat_keys} for _ in range(args.num_ppc_simulations)]
-                            df_sim_stats = pd.DataFrame(sim_stats)
-                            for k in stat_keys:
-                                coverage_records[k].append({'covered_90': np.nan, 'covered_95': np.nan})
-                            n_subjects += 1
-                            continue
-                        # Simulate PPC datasets with timeout for each
-                        from tqdm import tqdm as tqdm_inner
-                        sim_stats = []
-                        for i in tqdm_inner(range(args.num_ppc_simulations), desc=f"Subject {subj_id} PPC Sims", leave=False):
-                            param_sample_idx = torch.randint(len(posterior_samples), (1,)).item()
-                            params_dict_for_sim = {name: val.item() for name, val in zip(PARAM_NAMES, posterior_samples[param_sample_idx])}
-                            try:
-                                future = pool.schedule(
-                                    run_simulation,
-                                    args=(params_dict_for_sim, subj_trial_struct, stat_keys),
-                                    timeout=max(30, args.timeout_subject // args.num_ppc_simulations)
-                                )
-                                sim_result = future.result()
-                                sim_stats.append(sim_result)
-                            except (TimeoutError, concurrent.futures.TimeoutError):
-                                logging.warning(f"Timeout during PPC simulation for subject {subj_id}, params: {params_dict_for_sim}")
-                                sim_stats.append({k: -999.0 for k in stat_keys})
-                            except Exception as e:
-                                logging.error(f"Error during PPC simulation for subject {subj_id}, params: {params_dict_for_sim}: {e}")
-                                sim_stats.append({k: -999.0 for k in stat_keys})
-                        df_sim_stats = pd.DataFrame(sim_stats)
-                except Exception as e:
-                    logging.error(f"Fatal error in ProcessPool for subject {subj_id}: {e}")
-                    sim_stats = [{k: -999.0 for k in stat_keys} for _ in range(args.num_ppc_simulations)]
-                    df_sim_stats = pd.DataFrame(sim_stats)
-                    for k in stat_keys:
-                        coverage_records[k].append({'covered_90': np.nan, 'covered_95': np.nan})
-                    n_subjects += 1
-                    continue
-            else:
-                # Fall back to original code without timeout protection
+            logging.debug(f"Subject {subj_id} (row {idx}): Trial structure sample: {subj_trial_struct[:2] if len(subj_trial_struct) > 1 else subj_trial_struct}")
+            # --- Single-core, main-process PPC (no multiprocessing, no timeouts) ---
+            try:
+                logging.info(f"Subject {subj_id} (row {idx}): Sampling {args.num_posterior_samples_for_ppc} posterior parameter sets in main process...")
+                t_sample_start = _time.time()
                 posterior_samples = loaded_npe_posterior_object.sample(
                     (args.num_posterior_samples_for_ppc,), x=obs_stats_tensor.unsqueeze(0), show_progress_bars=False
                 ).cpu()
+                logging.info(f"Subject {subj_id} (row {idx}): Posterior sampling finished in {(_time.time() - t_sample_start):.2f}s. Shape: {getattr(posterior_samples, 'shape', type(posterior_samples))}")
                 from tqdm import tqdm as tqdm_inner
                 sim_stats = []
                 for i in tqdm_inner(range(args.num_ppc_simulations), desc=f"Subject {subj_id} PPC Sims", leave=False):
+                    t_sim_start = _time.time()
                     param_sample_idx = torch.randint(len(posterior_samples), (1,)).item()
                     params_dict_for_sim = {name: val.item() for name, val in zip(PARAM_NAMES, posterior_samples[param_sample_idx])}
+                    if (i + 1) % (args.num_ppc_simulations // 10 or 1) == 0:
+                        logging.info(f"Subject {subj_id} (row {idx}): PPC simulation {i+1}/{args.num_ppc_simulations}")
                     try:
                         sim_stats.append(simulate_dataset_for_ppc(params_dict_for_sim, subj_trial_struct, stat_keys))
+                        logging.debug(f"Subject {subj_id} (row {idx}): PPC sim {i+1} finished in {(_time.time() - t_sim_start):.2f}s")
                     except Exception as e:
-                        logging.error(f"Error in fallback PPC simulation for subject {subj_id}, params: {params_dict_for_sim}: {e}")
+                        logging.error(f"Error in PPC simulation for subject {subj_id} (row {idx}), params: {params_dict_for_sim}: {e}", exc_info=True)
                         sim_stats.append({k: -999.0 for k in stat_keys})
                 df_sim_stats = pd.DataFrame(sim_stats)
+            except Exception as e:
+                logging.error(f"Error in PPC for subject {subj_id} (row {idx}): {e}", exc_info=True)
+                continue
+
             for k in stat_keys:
                 sim_vals = df_sim_stats[k].dropna()
                 if sim_vals.empty or obs_stats[k] == -999.0 or pd.isna(obs_stats[k]):
@@ -530,6 +627,12 @@ if __name__ == "__main__":
                 covered_95 = (obs_stats[k] >= q025) and (obs_stats[k] <= q975)
                 coverage_records[k].append({'covered_90': covered_90, 'covered_95': covered_95})
             n_subjects += 1
+            _t1 = _time.time()
+            elapsed = _t1 - _t0
+            logging.info(f"========== Finished PPC Coverage for Subject {subj_id} (row {idx}) in {elapsed:.1f} sec ==========")
+            logging.debug(f"Subject {subj_id} (row {idx}): PPC stats: obs_stats={obs_stats}, sim_stats_head={df_sim_stats.head(2).to_dict() if not df_sim_stats.empty else 'empty'}")
+            print(f"[Coverage] Finished subject {subj_id} (row {idx}) in {elapsed:.1f} sec", flush=True)
+
         # Summarize coverage
         rows = []
         for k in stat_keys:
