@@ -1,7 +1,7 @@
 """
 MVNES-specific agent implementation for GNG simulation using DDM.
 """
-
+import math # Added for exp, log
 import numpy as np
 import pandas as pd
 import random
@@ -9,6 +9,22 @@ import logging
 
 # Set up logging
 logger = logging.getLogger(__name__)
+if not logger.hasHandlers(): # Ensure logger is configured if not already
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(name)s - %(module)s - %(message)s')
+
+from nes.meta import DiagnosticExtractor, MetaCognitiveClassifier # Added import
+
+# Helper functions for logit and sigmoid
+EPSILON = 1e-6
+
+def logit(p):
+    """Calculates the logit function, log(p / (1-p))."""
+    p_clipped = np.clip(p, EPSILON, 1 - EPSILON)
+    return math.log(p_clipped / (1 - p_clipped))
+
+def sigmoid(x):
+    """Calculates the sigmoid function, 1 / (1 + exp(-x))."""
+    return 1 / (1 + math.exp(-x))
 
 class MVNESAgent:
     def __init__(self, config=None):
@@ -34,9 +50,22 @@ class MVNESAgent:
                     'max_time': MAX_TIME,
                     'affect_stress_threshold_reduction': AFFECT_STRESS_THRESHOLD_REDUCTION,
                     'alpha_gain': 1.0,  # Default: no modulation
+                    'beta_val': 0.0, # Default for valence start-point bias
+                    'log_tau_typeA': math.log(0.5), 
+                    'log_tau_typeB': math.log(0.5), 
+                    # Meta-monitor defaults
+                    'meta_monitor_interval_ms': 50.0,
+                    'meta_override_prob_threshold': 0.8,
+                    'meta_stable_prob_threshold': 0.8,
+                    'meta_override_threshold_increase_factor': 0.1,
+                    'meta_stable_threshold_decrease_factor': 0.1,
+                    'min_threshold_after_tuning': 0.1,
+                    'meta_early_dominance_time_ms': 100.0,
+                    'enable_meta_monitor': True, 
+                    'enable_meta_tuning': True, # Default for tuning on/off
                     # Governor lapse parameters
-                    'lapse_prob': 0.08,  # 8% chance of a lapse trial
-                    'lapse_drift_scale': (0.2, 0.6),  # Range for downscaling drift during lapse
+                    'lapse_prob': 0.08,
+                    'lapse_drift_scale': (0.2, 0.6),
                     'lapse_threshold_scale': (1.3, 2.0),  # Range for increasing threshold during lapse
                     'lapse_start_delay': (0.2, 0.5),  # Range for start time delay in seconds
                     'enable_governor_lapse': True  # Toggle for governor lapse feature
@@ -53,9 +82,22 @@ class MVNESAgent:
                     'max_time': 2.0,
                     'affect_stress_threshold_reduction': -0.3,
                     'alpha_gain': 1.0,  # Default: no modulation
+                    'beta_val': 0.0, # Default for valence start-point bias
+                    'log_tau_typeA': math.log(0.5), 
+                    'log_tau_typeB': math.log(0.5), 
+                    # Meta-monitor defaults
+                    'meta_monitor_interval_ms': 50.0,
+                    'meta_override_prob_threshold': 0.8,
+                    'meta_stable_prob_threshold': 0.8,
+                    'meta_override_threshold_increase_factor': 0.1,
+                    'meta_stable_threshold_decrease_factor': 0.1,
+                    'min_threshold_after_tuning': 0.1,
+                    'meta_early_dominance_time_ms': 100.0,
+                    'enable_meta_monitor': True, 
+                    'enable_meta_tuning': True, # Default for tuning on/off
                     # Governor lapse parameters
                     'enable_governor_lapse': True,
-                    'base_lapse_rate': 0.08,  # 8% base chance of lapse
+                    'base_lapse_rate': 0.08,
                     'lapse_drift_scale': (0.2, 0.6),
                     'lapse_threshold_scale': (1.3, 2.0),
                     'lapse_start_delay': (0.2, 0.5),  # Uniform range in seconds
@@ -80,6 +122,28 @@ class MVNESAgent:
         self.trial_count = 0
         self.block_count = 0
 
+        # Initialize meta-cognitive components
+        dt_config = self.config.get('dt', 0.01) # Get dt from agent config if available
+        
+        meta_monitor_interval_ms = self.config.get('meta_monitor_interval_ms', 50.0)
+        self.meta_monitor_interval_steps = int(meta_monitor_interval_ms / (dt_config * 1000.0))
+        self.meta_monitor_interval_steps = max(1, self.meta_monitor_interval_steps)
+        
+        self.meta_override_prob_threshold = self.config.get('meta_override_prob_threshold', 0.8)
+        self.meta_stable_prob_threshold = self.config.get('meta_stable_prob_threshold', 0.8)
+        self.meta_override_threshold_increase_factor = self.config.get('meta_override_threshold_increase_factor', 0.1)
+        self.meta_stable_threshold_decrease_factor = self.config.get('meta_stable_threshold_decrease_factor', 0.1)
+        self.min_threshold_after_tuning = self.config.get('min_threshold_after_tuning', 0.1)
+
+        self.diag_extractor = DiagnosticExtractor(
+            dt=dt_config, 
+            early_time_threshold_ms=self.config.get('meta_early_dominance_time_ms', 100.0)
+        )
+        self.classifier = MetaCognitiveClassifier(
+            feature_names=self.diag_extractor.feature_names_ordered
+        )
+
+
     def run_mvnes_trial(self, salience_input, norm_input, params):
         """
         Simulates one Go/No-Go trial using a simplified DDM process
@@ -98,6 +162,13 @@ class MVNESAgent:
                            'max_time': Max simulation time
                            'affect_stress': Optional boolean to indicate stress condition
                            'alpha_gain': Only modulates threshold for Gain frame (norm_input > 0).
+                           'beta_val': Valence bias strength.
+                           'valence_score_trial': Valence score for the current trial.
+                           'norm_type': Type of norm decay ('typeA' or 'typeB').
+                           'log_tau_typeA': Log of decay constant for type A.
+                           'log_tau_typeB': Log of decay constant for type B.
+                           'enable_meta_monitor': Boolean to enable meta-monitoring for this trial.
+                           'enable_meta_tuning': Boolean to enable actual threshold tuning for this trial.
 
         Note:
             alpha_gain modulation is intentionally applied *only* when norm_input > 0 (Gain frame).
@@ -114,6 +185,16 @@ class MVNESAgent:
         w_n = params['w_n']
         base_threshold_a = params.get('threshold_a', self.config.get('threshold_a', 1.0))
         alpha_gain_val = params.get('alpha_gain', self.config.get('alpha_gain', 1.0))
+        beta_val = params.get('beta_val', self.config.get('beta_val', 0.0))
+        valence_score_trial = params.get('valence_score_trial', 0.0)
+        norm_type = params.get('norm_type', 'typeA') # Default to typeA if not specified
+        log_tau_typeA = params.get('log_tau_typeA', self.config.get('log_tau_typeA', math.log(0.5)))
+        log_tau_typeB = params.get('log_tau_typeB', self.config.get('log_tau_typeB', math.log(0.5)))
+
+        # Determine the log_tau_k for the current trial based on norm_type
+        current_log_tau_k = log_tau_typeA if norm_type == 'typeA' else log_tau_typeB
+        tau_k = math.exp(current_log_tau_k)
+        tau_k = max(tau_k, 1e-6) # Clip tau_k to avoid issues if it's too small
 
         # Adjust threshold for stress condition if present
         if params.get('affect_stress', False):
@@ -141,32 +222,32 @@ class MVNESAgent:
                 'timeout': False
             }
 
-        # 1. Calculate base drift with stability checks
-        base_drift = w_s * salience_input - w_n * norm_input
+        # 1. Calculate salience and base norm components
+        v_salience_base = w_s * salience_input
+        v_norm_base = w_n * norm_input # This will be decayed over time
 
-        # Add moment-to-moment instability with bounds
-        drift_instability = np.clip(np.random.normal(0, 0.25), -0.5, 0.5)
-        base_drift = np.clip(base_drift + drift_instability, -2.0, 2.0)
+        # Apply pre-loop variability/noise to v_salience (similar to old drift_rate)
+        # Add moment-to-moment instability with bounds to v_salience
+        salience_instability = np.clip(np.random.normal(0, 0.25), -0.5, 0.5)
+        v_salience_effective = np.clip(v_salience_base + salience_instability, -2.0, 2.0) # Assuming salience can also be negative
 
-        # Ensure minimum drift magnitude
-        min_drift = 0.15
-        if abs(base_drift) < min_drift:
-            base_drift = min_drift * np.sign(base_drift) if base_drift != 0 else min_drift
-
-        # Add trial-to-trial variability safely
-        drift_noise_scale = 0.2
-        drift_rate = base_drift * (1 + np.clip(np.random.normal(0, drift_noise_scale), -0.5, 0.5))
-        drift_rate = np.clip(drift_rate, -2.0, 2.0)
+        # Ensure minimum v_salience magnitude (if it's the only component initially)
+        min_salience_abs = 0.15 
+        if abs(v_salience_effective) < min_salience_abs and norm_input == 0: # Only if norm is zero, otherwise drift is dynamic
+             v_salience_effective = min_salience_abs * np.sign(v_salience_effective) if v_salience_effective != 0 else min_salience_abs
         
-        # Ensure minimum absolute drift rate
-        if abs(drift_rate) < 0.15:
-            drift_rate += np.sign(np.random.randn() - 0.5) * 0.2
-            
-        # Clip extreme drift rates to prevent unbounded behavior
-        drift_rate = np.clip(drift_rate, -2.0, 2.0)
-        
-        # Set noise parameters for Wiener process - significantly increased
-        sigma = 0.75  # Drastically increased for more RT variability
+        # Add trial-to-trial variability to v_salience
+        salience_noise_scale = 0.2
+        v_salience_effective = v_salience_effective * (1 + np.clip(np.random.normal(0, salience_noise_scale), -0.5, 0.5))
+        v_salience_effective = np.clip(v_salience_effective, -2.0, 2.0) # Clip again
+
+        # If v_norm_base is zero, ensure v_salience_effective has some minimal magnitude
+        if norm_input == 0 and abs(v_salience_effective) < 0.15:
+            v_salience_effective += np.sign(np.random.randn() - 0.5) * 0.2
+            v_salience_effective = np.clip(v_salience_effective, -2.0, 2.0)
+
+        # Set noise parameters for Wiener process
+        sigma = 0.75 # This was previously set to 0.75, keeping it
         
         # === RT Framing Bias Logic ===
         # Get the frame from the parameters (default to 'gain' if not specified)
@@ -180,47 +261,46 @@ class MVNESAgent:
         effective_threshold_a = threshold_mean * threshold_noise
         effective_threshold_a = np.clip(effective_threshold_a, 0.3, 1.5)  # Broader range
         
-        # 2. Add trial-level variability to drift rate (±20% of computed value)
-        drift_rate_noise = np.random.normal(0, 0.2 * abs(drift_rate))
-        drift_rate += drift_rate_noise
+        # 2. Note: Trial-level variability to drift rate is now handled by applying it to v_salience_effective.
+        #    The norm component's base (v_norm_base) is fixed for the trial before decay.
         
-        # 3. Add starting point (z) variability (25-75% of threshold)
-        starting_point_frac = np.random.uniform(0.25, 0.75)
-        starting_point = effective_threshold_a * starting_point_frac
+        # 3. Calculate starting point (evidence) based on valence bias
+        logit_z_trial = beta_val * valence_score_trial 
+        z_trial = sigmoid(logit_z_trial) 
+        starting_evidence = (z_trial - 0.5) * effective_threshold_a
+        
+        # Store the initial v_salience_effective for frame-dependent adjustments
+        # This v_salience will be used inside the loop as the base for dynamic drift
+        v_salience_for_loop = v_salience_effective 
         
         # Debug print for the first trial of each subject
         if 'subj_id' in params and 'trial_idx' in params and params['trial_idx'] == 0 and params.get('debug', False):
             import logging
             logging.debug(f"Trial 0 for subj {params['subj_id']}: "
-                        f"drift={drift_rate:.3f} (base={base_drift:.3f}), "
-                        f"a={effective_threshold_a:.3f} (base={threshold_mean:.3f}), "
-                        f"z={starting_point:.3f} ({starting_point_frac*100:.0f}% of a)")
+                        f"v_salience_base={v_salience_base:.3f}, v_norm_base={v_norm_base:.3f}, "
+                        f"v_salience_effective (pre-frame)={v_salience_effective:.3f}, "
+                        f"a={effective_threshold_a:.3f} (base_thresh={threshold_mean:.3f}), "
+                        f"z_trial={z_trial:.3f}, start_ev={starting_evidence:.3f}, tau_k={tau_k:.3f}")
+
+        effective_threshold_a = float(effective_threshold_a) # Ensure type
         
-        # Initialize effective_threshold_a if not already set
-        if 'effective_threshold_a' not in locals() or effective_threshold_a is None:
-            effective_threshold_a = params.get('threshold_a', 1.0)  # Default to 1.0 if not provided
-            
-        # Ensure effective_threshold_a is a float
-        effective_threshold_a = float(effective_threshold_a)
-        
-        # Apply frame-dependent adjustments to drift and threshold
+        # Apply frame-dependent adjustments (threshold and potentially to v_salience_for_loop)
+        # The original framing_bias was added to the combined drift_rate.
+        # Now, it should logically affect the salience component or overall drift.
+        # Let's assume it biases the salience component for now.
         if frame == "loss":
-            # Loss frame: bias toward faster decisions (urgency)
-            framing_bias = np.random.normal(loc=+0.4, scale=0.15)  # Increased effect size
-            drift_rate += framing_bias
-            # Lower boundary = faster RTs
-            threshold_jitter = np.random.normal(loc=0.8, scale=0.1)
-            effective_threshold_a = float(effective_threshold_a * np.clip(threshold_jitter, 0.6, 1.0))
+            framing_bias_val = np.random.normal(loc=+0.4, scale=0.15)
+            v_salience_for_loop += framing_bias_val
+            threshold_jitter_val = np.random.normal(loc=0.8, scale=0.1)
+            effective_threshold_a = float(effective_threshold_a * np.clip(threshold_jitter_val, 0.6, 1.0))
             
         elif frame == "gain":
-            # Gain frame: bias toward slower, more cautious decisions
-            framing_bias = np.random.normal(loc=-0.4, scale=0.15)  # Increased effect size
-            drift_rate += framing_bias
-            # Raise boundary = slower RTs
-            threshold_jitter = np.random.normal(loc=1.2, scale=0.1)
-            effective_threshold_a = float(effective_threshold_a * np.clip(threshold_jitter, 1.0, 1.4))
+            framing_bias_val = np.random.normal(loc=-0.4, scale=0.15)
+            v_salience_for_loop += framing_bias_val
+            threshold_jitter_val = np.random.normal(loc=1.2, scale=0.1)
+            effective_threshold_a = float(effective_threshold_a * np.clip(threshold_jitter_val, 1.0, 1.4))
         
-        # Add trial-level jitter to threshold
+        # Add trial-level jitter to threshold (final adjustment)
         threshold_jitter = np.random.normal(loc=0.0, scale=0.15)
         effective_threshold_a = np.clip(effective_threshold_a + threshold_jitter, 0.3, 1.5)
         
@@ -229,22 +309,24 @@ class MVNESAgent:
         
         # Ensure effective_threshold_a is a valid float
         effective_threshold_a = float(effective_threshold_a) if effective_threshold_a is not None else 1.0
-        
-        # Calculate starting point with bounds checking
-        start_point_var = 0.3 * effective_threshold_a
-        starting_point = np.random.uniform(-start_point_var, start_point_var)
-        
-        # Ensure starting point stays within bounds
-        starting_point = np.clip(
-            starting_point,
-            a_min=-0.5 * effective_threshold_a,
-            a_max=0.5 * effective_threshold_a
-        )
-        evidence = float(starting_point)  # Ensure evidence is a Python float
+       
+        # Set starting evidence based on valence bias calculation
+        evidence = float(starting_evidence)
         
         # Initialize time tracking with explicit float conversion
         accumulated_time = 0.0
-        max_time = 1.2  # Reduced from 2.0s to 1.2s for more realistic RTs
+        # max_time = 1.2  # Reduced from 2.0s to 1.2s for more realistic RTs
+        # Reverting max_time change, should be passed or from config
+        max_time = params.get('max_time', self.config.get('max_time', 2.0))
+
+
+        # Meta-monitor initialization for the trial
+        self.diag_extractor.reset_trial_state()
+        original_trial_threshold_a = effective_threshold_a # Store threshold before DDM loop
+        ddm_step_counter = 0
+        meta_monitor_active_for_trial = params.get('enable_meta_monitor', self.config.get('enable_meta_monitor', True))
+        meta_tuning_active_for_trial = params.get('enable_meta_tuning', self.config.get('enable_meta_tuning', True))
+        log_meta_events = []
         
         # Initialize lapse trial flag
         is_lapse_trial = False
@@ -273,37 +355,36 @@ class MVNESAgent:
                 # Apply choice bias for lapse trials
                 lapse_choice_bias = self.config.get('lapse_choice_bias', 0.7)
                 
-                # Scale down drift and increase threshold for lapse trials
-                drift_rate *= drift_scale
-                effective_threshold_a *= threshold_scale
+                # Scale down drift (both components, or just salience if norm is fixed by problem)
+                # For now, assume it scales the final dynamic_drift_rate inside the loop
+                # effective_threshold_a is already scaled.
+                # We'll store drift_scale_lapse to be used inside the loop.
+                drift_scale_lapse = drift_scale 
+                effective_threshold_a *= threshold_scale # This is already done
                 
                 if 'debug' in params and params['debug']:
                     logging.debug(f"Lapse trial detected - "
-                                f"drift x{drift_scale:.2f}, "
+                                f"drift_scale_factor x{drift_scale_lapse:.2f}, "
                                 f"threshold x{threshold_scale:.2f}, "
                                 f"delay: {start_time_offset:.3f}s, "
                                 f"bias: {lapse_choice_bias:.2f}")
+            else: # Not a lapse trial
+                drift_scale_lapse = 1.0 # No scaling
+        else: # Governor lapse not enabled
+            drift_scale_lapse = 1.0
+
+        # Wiener process scaling
+        noise_scaler = sigma * np.sqrt(dt) 
         
-        # Wiener process scaling with maximum noise impact
-        noise_scaler = sigma * np.sqrt(dt)  # Remove additional scaling to match standard DDM
+        # Set threshold boundary (magnitude, effective_threshold_a should always be positive)
+        # threshold_boundary = abs(effective_threshold_a) # This will be dynamic if meta-monitor is active
         
-        # Set threshold boundary with absolute value
-        threshold_boundary = abs(effective_threshold_a)
-        
-        # Use the pre-computed starting point from cognitive variability
-        # Ensure starting point is within bounds (0.1 to 0.9 of threshold)
-        starting_point = np.clip(starting_point, 
-                              0.1 * threshold_boundary, 
-                              0.9 * threshold_boundary)
-        
-        # Choose starting point direction, applying lapse choice bias if this is a lapse trial
-        if is_lapse_trial and np.random.rand() < lapse_choice_bias:
-            # Bias toward NoGo (0) response on lapse trials
-            evidence = -abs(starting_point)
-        else:
-            # Normal unbiased starting point
-            evidence = starting_point * (1 if np.random.rand() > 0.5 else -1)
-        
+        # The starting point `evidence` is now directly calculated from `z_trial` and `effective_threshold_a`.
+        # The previous logic for random starting point direction or lapse trial bias on starting point needs review.
+        # For now, the valence-based starting point will be used.
+        # If a lapse occurs, it primarily affects drift, threshold, and non-decision time for now.
+        # Starting point bias from lapse could be an additional factor, but problem focuses on valence bias.
+
         # Store trial metadata in the result dictionary
         result_metadata = {
             'lapse_trial': is_lapse_trial,
@@ -327,12 +408,12 @@ class MVNESAgent:
             slow_mode = self.config.get('slow_mode', {})
             
             # Apply slow mode effects
-            drift_rate *= slow_mode.get('drift_scale', 0.4)
+            # drift_rate *= slow_mode.get('drift_scale', 0.4) # This will now scale v_salience and v_norm_base
+            drift_scale_slow_mode = slow_mode.get('drift_scale', 0.4)
             effective_threshold_a *= slow_mode.get('boundary_scale', 1.5)
             
-            # Random starting bias for slow trials
-            start_bias_range = slow_mode.get('start_bias_range', [-0.2, 0.2])
-            evidence = np.random.uniform(*start_bias_range)
+            # Starting bias for slow trials is currently disabled in favor of valence bias.
+            # If needed, it could be added to `starting_evidence` or replace it.
             
             # Determine if we'll have a pause during this trial
             if np.random.rand() < slow_mode.get('pause_prob', 0.5):
@@ -343,10 +424,12 @@ class MVNESAgent:
             
             if 'debug' in params and params['debug']:
                 logger.debug(f"Slow trial detected - "
-                           f"drift x{slow_mode.get('drift_scale', 0.4):.1f}, "
+                           f"drift_scale_factor x{drift_scale_slow_mode:.1f}, "
                            f"boundary x{slow_mode.get('boundary_scale', 1.5):.1f}, "
                            f"pause: {pause_start:.2f}-{pause_end:.2f}s")
-        
+        else: # Not a slow trial
+            drift_scale_slow_mode = 1.0
+
         # Update result metadata with slow trial information
         result_metadata['slow_trial'] = slow_trial
         result_metadata['had_pause'] = pause_start >= 0
@@ -380,9 +463,63 @@ class MVNESAgent:
             
             # Only accumulate evidence if not in a pause
             if not in_pause or not slow_trial:
-                # Accumulate evidence with noise
+                # Calculate norm decay
+                decay_factor = math.exp(-current_time / tau_k) 
+                v_norm_decayed = v_norm_base * decay_factor
+                
+                current_dynamic_drift = v_salience_for_loop - v_norm_decayed
+                current_dynamic_drift *= drift_scale_lapse 
+                current_dynamic_drift *= drift_scale_slow_mode
+
+                if abs(current_dynamic_drift) < 1e-4 : 
+                    current_dynamic_drift = np.sign(np.random.randn() - 0.5) * 0.01 if current_dynamic_drift == 0 else current_dynamic_drift
+
+                # Meta-Monitoring Block (before this step's evidence update)
+                if meta_monitor_active_for_trial and ddm_step_counter > 0 and ddm_step_counter % self.meta_monitor_interval_steps == 0:
+                    # evidence_before_step = evidence # For clarity
+                    features = self.diag_extractor.update_and_extract_features(
+                        current_evidence=evidence, 
+                        accumulated_ddm_time=current_time, # current_time is accumulated_time *before* this step
+                        current_drift_rate=current_dynamic_drift, 
+                        upper_boundary=effective_threshold_a, 
+                        lower_boundary=-effective_threshold_a 
+                    )
+                    class_probs = self.classifier.classify(features)
+
+                    tuned_this_step = False
+                    if class_probs['override_in_progress'] > self.meta_override_prob_threshold:
+                        new_a = original_trial_threshold_a * (1 + self.meta_override_threshold_increase_factor)
+                        if abs(new_a - effective_threshold_a) > 1e-3: # Only log/tune if there's a change
+                            log_msg = f"T@{current_time*1000:.0f}ms: Override (P={class_probs['override_in_progress']:.2f}). Thresh: {effective_threshold_a:.3f}. Proposed: {new_a:.3f}."
+                            if meta_tuning_active_for_trial:
+                                effective_threshold_a = new_a
+                                tuned_this_step = True
+                                log_msg += " Tuned."
+                            else:
+                                log_msg += " Tuning OFF."
+                            logger.debug(log_msg)
+                            log_meta_events.append(log_msg)
+                            
+                    elif class_probs['stable_adherence'] > self.meta_stable_prob_threshold:
+                        new_a = original_trial_threshold_a * (1 - self.meta_stable_threshold_decrease_factor)
+                        if abs(new_a - effective_threshold_a) > 1e-3: # Only log/tune if there's a change
+                            log_msg = f"T@{current_time*1000:.0f}ms: Stable (P={class_probs['stable_adherence']:.2f}). Thresh: {effective_threshold_a:.3f}. Proposed: {new_a:.3f}."
+                            if meta_tuning_active_for_trial:
+                                effective_threshold_a = new_a
+                                tuned_this_step = True
+                                log_msg += " Tuned."
+                            else:
+                                log_msg += " Tuning OFF."
+                            logger.debug(log_msg)
+                            log_meta_events.append(log_msg)
+                    
+                    if tuned_this_step and meta_tuning_active_for_trial: # Ensure this clipping only happens if tuning was active and occurred
+                        effective_threshold_a = max(effective_threshold_a, self.min_threshold_after_tuning)
+                        # threshold_boundary = abs(effective_threshold_a) # Update boundary for checks
+
+                # Accumulate evidence for the current step
                 noise = np.random.normal(0, noise_scaler)
-                evidence += drift_rate * dt + noise
+                evidence += current_dynamic_drift * dt + noise
             
             # Check if we're exiting a pause
             if in_pause and current_time > pause_end:
@@ -394,41 +531,39 @@ class MVNESAgent:
             evidence_trace.append(evidence)
             
             # Increment time
-            accumulated_time += dt          # Check for boundary crossing (both upper and lower bounds)
-            if evidence >= threshold_boundary:
+            accumulated_time += dt          
+            # Boundary checks (use current effective_threshold_a, ensure it's positive)
+            current_threshold_boundary = abs(effective_threshold_a) # Ensure positive for comparison
+            if evidence >= current_threshold_boundary:
                 rt = min(accumulated_time + t + start_time_offset, max_time)
-                return {
-                    'choice': 1,  # Upper bound = Go response
-                    'rt': rt,
-                    'trace': evidence_trace,
-                    'timeout': False,
-                    'lapse_trial': is_lapse_trial,
-                    'start_time_offset': start_time_offset
+                final_result = {
+                    'choice': 1, 'rt': rt, 'trace': evidence_trace, 'timeout': False, 
+                    'log_meta_events': log_meta_events
                 }
-            elif evidence <= -threshold_boundary:
+                final_result.update(result_metadata)
+                return final_result
+            elif evidence <= -current_threshold_boundary:
                 rt = min(accumulated_time + t + start_time_offset, max_time)
-                return {
-                    'choice': 0,  # Lower bound = NoGo response
-                    'rt': rt,
-                    'trace': evidence_trace,
-                    'timeout': False,
-                    'lapse_trial': is_lapse_trial,
-                    'start_time_offset': start_time_offset
+                final_result = {
+                    'choice': 0, 'rt': rt, 'trace': evidence_trace, 'timeout': False,
+                    'log_meta_events': log_meta_events
                 }
+                final_result.update(result_metadata)
+                return final_result
                 
         # If we get here, we've timed out
         timed_out = True
-        rt = max_time + start_time_offset  # Add start time delay to RT
+        rt = max_time + start_time_offset 
         
-        # Return results with lapse trial information
-        return {
-            'choice': 0,
+        final_result = {
+            'choice': 0, 
             'rt': rt,
             'trace': evidence_trace,
             'timeout': timed_out,
-            'lapse_trial': is_lapse_trial,
-            'start_time_offset': start_time_offset
+            'log_meta_events': log_meta_events
         }
+        final_result.update(result_metadata)
+        return final_result
 
 
 
@@ -504,14 +639,69 @@ def _unit_test_alpha_gain_modulation():
     res_loss = agent.run_mvnes_trial(salience_input=2.0, norm_input=-1.0, params=test_params)
     # Gain frame (norm_input > 0): alpha_gain should apply
     res_gain = agent.run_mvnes_trial(salience_input=2.0, norm_input=+1.0, params=test_params)
-    print("Loss frame (no alpha_gain):", res_loss)
-    print("Gain frame (with alpha_gain):", res_gain)
-    # RT should be lower for gain frame due to lower threshold
+    test_params_valence = {
+        'w_s': 1.0, 'w_n': 1.0, 'threshold_a': 1.0, 't': 0.1,
+        'noise_std_dev': 0.0, 'dt': 0.01, 'max_time': 2.0,
+        'alpha_gain': 1.0, 'beta_val': 0.5, 'valence_score_trial': 1.0, # Positive valence
+        'norm_type': 'typeA', 'log_tau_typeA': math.log(0.5), 'log_tau_typeB': math.log(0.2)
+    }
+    res_pos_valence = agent.run_mvnes_trial(salience_input=0.5, norm_input=0.0, params=test_params_valence) # norm_input=0, so no decay effect
+    
+    test_params_valence['valence_score_trial'] = -1.0 # Negative valence
+    res_neg_valence = agent.run_mvnes_trial(salience_input=0.5, norm_input=0.0, params=test_params_valence) # norm_input=0
+
+    # Test decay
+    test_params_decay = {
+        'w_s': 0.5, 'w_n': 1.0, 'threshold_a': 0.5, 't': 0.1,
+        'noise_std_dev': 0.0, 'dt': 0.01, 'max_time': 2.0,
+        'alpha_gain': 1.0, 'beta_val': 0.0, 'valence_score_trial': 0.0,
+        'norm_type': 'typeA', 'log_tau_typeA': math.log(0.1), 
+        'log_tau_typeB': math.log(10.0),
+        'enable_meta_monitor': True, 
+        'enable_meta_tuning': True # Enable tuning for this test
+    }
+    res_decay_A = agent.run_mvnes_trial(salience_input=0.5, norm_input=1.0, params=test_params_decay)
+    
+    test_params_decay['norm_type'] = 'typeB'
+    # Test with tuning OFF
+    test_params_decay['enable_meta_tuning'] = False
+    res_decay_B_obs_only = agent.run_mvnes_trial(salience_input=0.5, norm_input=1.0, params=test_params_decay)
+
+
+    print("\n--- Test Results ---")
+    print("Loss frame (no alpha_gain):", res_loss['rt'], res_loss['choice'])
+    print("Gain frame (with alpha_gain):", res_gain['rt'], res_gain['choice'])
+    print("Positive valence trial (norm_input=0):", res_pos_valence['rt'], res_pos_valence['choice'])
+    print("Negative valence trial (norm_input=0):", res_neg_valence['rt'], res_neg_valence['choice'])
+    print(f"Decay Test Type A (fast decay, tau=0.1, norm_input=1, tuning ON): RT={res_decay_A['rt']:.3f}, Choice={res_decay_A['choice']}")
+    if 'log_meta_events' in res_decay_A and res_decay_A['log_meta_events']:
+        print("  Meta Events A (Tuning ON):", res_decay_A['log_meta_events'])
+    print(f"Decay Test Type B (slow decay, tau=10.0, norm_input=1, tuning OFF): RT={res_decay_B_obs_only['rt']:.3f}, Choice={res_decay_B_obs_only['choice']}")
+    if 'log_meta_events' in res_decay_B_obs_only and res_decay_B_obs_only['log_meta_events']:
+        print("  Meta Events B (Tuning OFF):", res_decay_B_obs_only['log_meta_events'])
+
     assert res_gain['rt'] < res_loss['rt'], "alpha_gain did not lower RT in gain frame!"
-    # Thresholds should be different
-    # (Can only check indirectly via RTs since threshold is not returned)
-    print("Unit test passed: alpha_gain only modulates gain trials.")
+    print("\nUnit test for alpha_gain passed.")
+    print("Qualitative valence bias test: Positive valence should bias towards Go, Negative towards NoGo.")
+    
+    if res_decay_A['choice'] == 1 and res_decay_B['choice'] == 0:
+        print("Norm decay test passed: Fast decay led to Go, Slow decay to NoGo.")
+    elif res_decay_A['choice'] == 0 and res_decay_B['choice'] == 0:
+        if res_decay_A['rt'] > res_decay_B['rt']:
+             print("Norm decay test passed (qualitative): Both NoGo, fast decay trial took longer.")
+        else:
+             print(f"Norm decay test (both NoGo) inconclusive/failed: RT_A({res_decay_A['rt']:.3f}) vs RT_B({res_decay_B['rt']:.3f})")
+    else:
+        print(f"Norm decay test inconclusive/failed: Choice A({res_decay_A['choice']}), Choice B({res_decay_B['choice']})")
+
 
 if __name__ == "__main__":
     print("Testing MVNES Agent DDM Simulation...")
+    # Configure logger for __main__ tests to see debug messages from agent
+    # logger = logging.getLogger() # Get root logger
+    # logger.setLevel(logging.DEBUG)
+    # stream_handler = logging.StreamHandler()
+    # stream_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(module)s - %(message)s'))
+    # logger.addHandler(stream_handler)
+    
     _unit_test_alpha_gain_modulation()

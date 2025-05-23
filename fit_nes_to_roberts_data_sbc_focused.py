@@ -178,9 +178,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 sbi_logger = logging.getLogger('sbi')
 sbi_logger.setLevel(logging.WARNING)
 
-PARAM_NAMES = ['v_norm', 'a_0', 'w_s_eff', 't_0', 'alpha_gain']  # Order must match prior bounds below
-PRIOR_LOW = torch.tensor([0.1,  0.5,  0.2,  0.05, 0.5]) # Added 0.5 for alpha_gain
-PRIOR_HIGH = torch.tensor([2.0,  2.5,  1.5,  0.7, 1.0]) # Added 1.0 for alpha_gain
+PARAM_NAMES = ['v_norm', 'a_0', 'w_s_eff', 't_0', 'alpha_gain', 'beta_val', 'log_tau_typeA', 'log_tau_typeB'] # Added log_tau params
+PRIOR_LOW = torch.tensor([0.1,  0.5,  0.2,  0.05, 0.5, -0.45, -2.193, -2.193]) # Added log_tau priors
+PRIOR_HIGH = torch.tensor([2.0,  2.5,  1.5,  0.7, 1.0, 0.45, 0.807, 0.807]) # Added log_tau priors
 BASE_SIM_PARAMS = {
     'noise_std_dev': 1.0, 'dt': 0.01, 'max_time': 10.0, 'veto_flag': False
 }
@@ -377,14 +377,24 @@ def prepare_trial_template(roberts_data_path: Path, num_template_trials: int, se
     if df.empty:
         raise ValueError("No valid target trials found in Roberts data for template creation.")
 
-    template_cols = ['frame', 'cond', 'prob', 'is_gain_frame', 'time_constrained']
+    template_cols = ['frame', 'cond', 'prob', 'is_gain_frame', 'time_constrained', 'valence_score', 'norm_type'] # Added norm_type
+    
+    base_template_cols = ['frame', 'cond', 'prob', 'is_gain_frame', 'time_constrained']
     if len(df) < num_template_trials:
-        SUBJECT_TRIAL_STRUCTURE_TEMPLATE = df[template_cols].copy()
+        sampled_df = df[base_template_cols].copy()
     else:
-        SUBJECT_TRIAL_STRUCTURE_TEMPLATE = df[template_cols].sample(
-            n=num_template_trials, random_state=seed, replace=True # replace=True if N_template > N_available_unique_trial_configs
+        sampled_df = df[base_template_cols].sample(
+            n=num_template_trials, random_state=seed, replace=True 
         ).reset_index(drop=True)
-    logging.info(f"SUBJECT_TRIAL_STRUCTURE_TEMPLATE created with {len(SUBJECT_TRIAL_STRUCTURE_TEMPLATE)} trials.")
+
+    # Add the valence_score column, initialized to 0.0
+    sampled_df['valence_score'] = 0.0
+    # Add norm_type column, randomly assigned
+    sampled_df['norm_type'] = np.random.choice(["typeA", "typeB"], size=len(sampled_df))
+    
+    SUBJECT_TRIAL_STRUCTURE_TEMPLATE = sampled_df[template_cols].copy() # Ensure correct column order
+
+    logging.info(f"SUBJECT_TRIAL_STRUCTURE_TEMPLATE created with {len(SUBJECT_TRIAL_STRUCTURE_TEMPLATE)} trials, including 'valence_score' and 'norm_type'.")
 
     OBSERVED_CONDITION_RT_MEANS_FOR_IMPUTE = {}
     for cond_key_enum, cond_filters in CONDITIONS_ROBERTS.items():
@@ -415,13 +425,20 @@ def nes_sbi_simulator(params_tensor: torch.Tensor, stat_keys: List[str]) -> torc
     for _, trial_info in SUBJECT_TRIAL_STRUCTURE_TEMPLATE.iterrows():
         salience_input = trial_info['prob'] 
         norm_input = 1.0 if trial_info['is_gain_frame'] else -1.0
+        valence_score_trial = trial_info['valence_score'] 
+        norm_type_trial = trial_info['norm_type'] # Retrieve norm_type for the trial
 
         agent_run_params = {
             'w_n': params_dict['v_norm'], 
-            'threshold_a': params_dict['a_0'], # Pass base threshold directly
+            'threshold_a': params_dict['a_0'], 
             'w_s': params_dict['w_s_eff'], 
             't': params_dict['t_0'],
-            'alpha_gain': params_dict['alpha_gain'], # Added alpha_gain
+            'alpha_gain': params_dict['alpha_gain'],
+            'beta_val': params_dict['beta_val'], 
+            'valence_score_trial': valence_score_trial,
+            'log_tau_typeA': params_dict['log_tau_typeA'], # Pass log_tau_typeA
+            'log_tau_typeB': params_dict['log_tau_typeB'], # Pass log_tau_typeB
+            'norm_type': norm_type_trial, # Pass norm_type for the trial
             **BASE_SIM_PARAMS 
         }
         
@@ -439,16 +456,18 @@ def nes_sbi_simulator(params_tensor: torch.Tensor, stat_keys: List[str]) -> torc
             
             sim_results_list.append({
                 'rt': sim_rt, 'choice': trial_output.get('choice', np.nan),
-                'frame': trial_info['frame'], 'cond': trial_info['cond']
-                # 'time_constrained' and 'is_gain_frame' will be re-added by calculate_summary_stats if needed
+                'frame': trial_info['frame'], 'cond': trial_info['cond'],
+                'valence_score': trial_info['valence_score'], 
+                'norm_type': trial_info['norm_type'] # Keep norm_type for potential later analysis
             })
         except Exception as e_sim:
             logging.debug(f"Sim trial exception for params {params_dict}: {e_sim}")
-            sim_results_list.append({'rt': np.nan, 'choice': np.nan, 'frame': trial_info['frame'], 'cond': trial_info['cond']})
+            sim_results_list.append({'rt': np.nan, 'choice': np.nan, 
+                                     'frame': trial_info['frame'], 'cond': trial_info['cond'],
+                                     'valence_score': trial_info['valence_score'],
+                                     'norm_type': trial_info['norm_type']})
             
     df_sim_batch = pd.DataFrame(sim_results_list)
-    # calculate_summary_stats expects 'time_constrained', 'is_gain_frame' if not already present.
-    # It will add them.
     summary_stats_dict = calculate_summary_stats_roberts(df_sim_batch, stat_keys, OBSERVED_CONDITION_RT_MEANS_FOR_IMPUTE)
     
     summary_stats_vector = [summary_stats_dict.get(k, -999.0) for k in stat_keys]
